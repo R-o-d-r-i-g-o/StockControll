@@ -5,6 +5,7 @@ using System.Web.Security;
 using StockControll.Context;
 using StockControll.Models;
 using StockControll.ViewModel;
+using StockControll.Commons;
 
 namespace StockControll.Controllers
 {
@@ -26,7 +27,9 @@ namespace StockControll.Controllers
                 ResetCookies();
                 FormsAuthentication.SetAuthCookie(loginForm.Name, false);
 
-                var user = _db.Users.FirstOrDefault(u => !string.IsNullOrEmpty(u.Name));
+                var parsedPassword = AuthSettings.CalculateMD5(loginForm.Password);
+
+                var user = _db.Users.FirstOrDefault(u => u.Name == loginForm.Name && u.Password == parsedPassword);
                 if (user == null)
                     throw new Exception("Usuário não encontrado");
 
