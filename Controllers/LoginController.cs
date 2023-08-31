@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
+using StockControll.Context;
+using StockControll.Models;
 using StockControll.ViewModel;
 
 namespace StockControll.Controllers
 {
     public class LoginController : Controller
     {
-        
+        private readonly AppDbContext _db = new AppDbContext();
+
         public ActionResult Index()
         {
             return View();
@@ -19,46 +23,38 @@ namespace StockControll.Controllers
         {
             try
             {
+                ResetCookies();
                 FormsAuthentication.SetAuthCookie(loginForm.Name, false);
 
+                var user = _db.Users.FirstOrDefault(u => !string.IsNullOrEmpty(u.Name));
+                if (user == null)
+                    throw new Exception("Usuário não encontrado");
+
+                Session["user"] = user;
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
-                //view
+                ViewBag.ErrorMessage = (ex.InnerException ?? ex).Message;
 
                 return View("Index");
             }
         }
 
         [Authorize]
-        public ActionResult About()
+        public ActionResult SignOut()
         {
-            ViewBag.Message = "Your application description page.";
+            ResetCookies();
+            FormsAuthentication.SignOut();
 
-            return View();
-        }
-
-        [Authorize]
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            return RedirectToAction("Index", "Login");
         }
 
         private void ResetCookies()
         {
-            Session["masterUser"] = null;
-            Session["financialUser"] = null;
-            Session["franchiseTaxes"] = null;
-            Session["franchiseId"] = null;
-            Session["franchiseType"] = null;
-            Session["franchiseGateways"] = null;
+            Session["user"] = null;
             Session["timeout"] = null;
-            Session["ecId"] = null;
             Session.Clear();
         }
-
     }
 }

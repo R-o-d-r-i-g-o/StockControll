@@ -11,8 +11,6 @@ namespace StockControll.Context
     {
         public DbSet<User> Users { get; set; }
 
-        public AppDbContext() : base("name=YourConnectionString")
-        {
-        }
+        public AppDbContext() : base("name=DefaultConnection") { }
     }
 }

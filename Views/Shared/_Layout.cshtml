@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using System.Reflection
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -37,8 +39,8 @@
                         </a>
                     </li>
                     <li>
-                        <a href="@Url.Action("Index", "Login")">
-                            Login
+                        <a href="@Url.Action("SignOut", "Login")">
+                            Sair
                         </a>
                     </li>
                 </ul>
@@ -47,15 +49,14 @@
     </div>
     <div class="container body-content">
         @RenderBody()
-        
+
         <footer class="text-center navbar-fixed-bottom">
             <hr />
-            <p>&copy; @DateTime.Now.Year - Meu Aplicativo ASP.NET</p>
+            <p>&copy; Última Atualização - @(Assembly.GetExecutingAssembly())</p>
         </footer>
     </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/jquery", "~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
 </body>
 </html>
