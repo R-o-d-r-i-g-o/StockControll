@@ -24,7 +24,7 @@
                         <h2 class="panel-title">Login</h2>
                     </div>
                     <div class="panel-body">
-                        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                        @using (Html.BeginForm("SignIn", "Login", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                         {
                             @Html.AntiForgeryToken()
 
@@ -63,8 +63,6 @@
         $(document).ready(function () {
             $('#showPasswordBtn').click(function () {
                 var passwordInput = $('#passwordInput');
-
-                console.log('veio aqui ', passwordInput)
 
                 if (passwordInput.attr('type') === 'password') {
                     passwordInput.attr('type', 'text');

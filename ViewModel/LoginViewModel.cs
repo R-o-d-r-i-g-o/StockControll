@@ -7,7 +7,6 @@ namespace StockControll.ViewModel
 {
     public class UserViewModel
     {
-
         [Required(ErrorMessage = "Obrigatório")]
         [Display(Name = "Nome")]
         public string Name { get; set; }
