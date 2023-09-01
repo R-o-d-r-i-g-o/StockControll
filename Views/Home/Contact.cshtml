@@ -1,17 +1,48 @@
-﻿@{
+﻿@model StockControll.ViewModel.UsersViewModel
+@using PagedList.Mvc
+
+@{
     ViewBag.Title = "Contact";
 }
+
+<style>
+    .pagination-container {
+        display: flex;
+    }
+
+    .pagination-container > ul {
+        margin-inline: auto;
+    }
+</style>
+
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nome</th>
+                <th scope="col">Posição</th>
+                <th scope="col">hds</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <th scope="row">@user.Id</th>
+                    <td>@user.Name</td>
+                    <td>@user.UserType</td>
+                    <td>fjsdlkfj</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
-<address>
-    <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+<br />
+<p>Página @Model.Filters.Page de @Model.Users.PageCount</p>
+
+@Html.PagedListPager(Model.Users, Page => Url.Action("Contact", new { Rows = Model.Filters.Rows, Page = Page }))
