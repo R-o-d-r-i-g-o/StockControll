@@ -8,11 +8,11 @@ namespace StockControll.ViewModel
 {
     public class UserViewModel
     {
-        [Required(ErrorMessage = "Obrigatório")]
+        [Required(ErrorMessage = "O campo nome é obrigatório")]
         [Display(Name = "Nome")]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Obrigatório"), DataType(DataType.Password)]
+        [Required(ErrorMessage = "O campo senha é obrigatório"), DataType(DataType.Password)]
         [Display(Name = "Senha")]
         public string Password { get; set; }
     }
@@ -40,6 +40,5 @@ namespace StockControll.ViewModel
         public string ComfirmPassword { get; set; }
 
         public List<string> SelectedRoles { get; set; }
-        public List<string> AvailableRoles { get; set; }
     }
 }

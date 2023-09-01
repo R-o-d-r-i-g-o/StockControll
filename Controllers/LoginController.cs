@@ -29,14 +29,17 @@ namespace StockControll.Controllers
         {
             try
             {
-                ResetCookies();
-                FormsAuthentication.SetAuthCookie(loginForm.Name, false);
-
+                if (!ModelState.IsValid)
+                    throw new Exception(@"Preencha o formulário corretamente");
+               
                 var parsedPassword = AuthSettings.CalculateMD5(loginForm.Password);
 
                 var user = _db.Users.FirstOrDefault(u => u.Name == loginForm.Name && u.Password == parsedPassword);
                 if (user == null)
                     throw new Exception(@"Usuário não encontrado");
+
+                ResetCookies();
+                FormsAuthentication.SetAuthCookie(loginForm.Name, false);
 
                 Session["user"] = user;
                 return RedirectToAction("Index", "Home");

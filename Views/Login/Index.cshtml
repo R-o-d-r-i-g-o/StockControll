@@ -6,13 +6,14 @@
 }
 
 <style>
-    .mb-20 {
-        margin-bottom: 10px;
+    .field-validation-error {
+        color: red;
+        font-size: 10px;
     }
 </style>
 
 @Styles.Render("~/Content/bootstrap.min.css", "~/Content/site.css", "~/Content/sweetalert2.min.css")
-@Scripts.Render("~/Content/code.jquery.com_jquery-3.7.1.min.js", "~/Content/cdn.jsdelivr.net_npm_sweetalert2@11", "~/Content/sweetalert2.min.js")
+@Scripts.Render("~/Content/code.jquery.com_jquery-3.7.1.min.js", "~/Content/sweetalert2.min.js")
 
 <div class="container">
     <div class="row">
@@ -30,14 +31,17 @@
                             @Html.LabelFor(m => m.Name, new { @class = "col-md-3 control-label" })
                             <div class="col-md-9">
                                 @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.Name)
                             </div>
                         </div>
 
                         <div class="form-group">
                             @Html.LabelFor(m => m.Password, new { @class = "col-md-3 control-label" })
                             <div class="col-md-9">
-                                @Html.PasswordFor(m => m.Password, new { @class = "form-control mb-20", id = "passwordInput" })
+                                @Html.PasswordFor(m => m.Password, new { @class = "form-control", id = "passwordInput" })
+                                @Html.ValidationMessageFor(m => m.Password)
 
+                                <br />
                                 <a href="@Url.Action("Index", "Home")">
                                     Ainda não possui login?
                                 </a>
