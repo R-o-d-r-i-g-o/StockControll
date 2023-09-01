@@ -7,10 +7,19 @@
 
 <style>
     .action-buttons {
-        max-width: 30%;
         display: flex;
-        gap: 5px;
-        justify-content: space-around;
+        gap: 15px;
+        justify-content: flex-end;
+        width: 100%;
+    }
+
+    .button-delete {
+        background: red !important;
+        border-color: red !important;
+    }
+
+    .fa-solid {
+        margin-right: 8px;
     }
 
     .modal-title {
@@ -25,6 +34,8 @@
             margin-inline: auto;
         }
 </style>
+
+@Styles.Render("~/Content/bootstrap.min.css", "~/Content/site.css", "~/Content/sweetalert2.min.css")
 
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
@@ -48,10 +59,15 @@
                     <td>@user.UserType</td>
                     <td>
                         <div class="action-buttons">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                            <i class="fa-solid fa-pen-to-square"></i>
-                            <i class="fa-solid fa-pen-to-square"></i>
-                            <i class="fa-solid fa-pen-to-square"></i>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                Editar
+                            </button>
+
+                            <button type="button" class="btn btn-primary button-delete" data-toggle="modal" data-target="#myModal">
+                                <i class="fa-solid fa-xmark"></i>
+                                Deletar
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -60,12 +76,25 @@
     </table>
 </div>
 
-<br />
-<p>Página @Model.Filters.Page de @Model.Users.PageCount</p>
+@if (@Model.Users.TotalItemCount > 0)
+{
+    <br />
+    <p>Exibindo de @Model.Filters.Page até @Model.Users.PageCount de @Model.Users.TotalItemCount</p>
 
-@Html.PagedListPager(Model.Users, Page => Url.Action("Contact", new { Rows = Model.Filters.Rows, Page = Page }))
-
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Open Modal</button>
+    @Html.PagedListPager(Model.Users, Page => Url.Action("Contact", new
+    {
+        Rows = Model.Filters.Rows,
+        Page = Page
+    }),
+    new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 3
+    })
+}
 
 <div class="modal fade" id="myModal">
     <div class="modal-dialog">
@@ -97,6 +126,8 @@
         </div>
     </div>
 </div>
+
+@Scripts.Render("~/Content/code.jquery.com_jquery-3.7.1.min.js", "~/Content/sweetalert2.min.js")
 
 <script>
     function submitForm() {
