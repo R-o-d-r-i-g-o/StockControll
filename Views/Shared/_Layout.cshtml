@@ -4,9 +4,12 @@
 <html lang="pt-BR">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Meu Aplicativo ASP.NET</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+X8/MFSc1UTd6ftl/Aq4gVgOp+OrCXaRkfjENn5wRGa0Jj4" crossorigin="anonymous">
+
+    @* para pegar icones: https://fontawesome.com/search *@
 
     @Styles.Render("~/Content/css", "~/bundles/modernizr")
 </head>
@@ -19,27 +22,39 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Nome do aplicativo", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @*@Html.ActionLink("Rafali", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })*@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>
                         <a href="@Url.Action("Index", "Home")">
-                            Home
+                            <i class="fa-solid fa-truck-fast"></i>
+                            Baixa de calçados
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("About", "Home")">
-                            Sobre
+                            <i class="fa-solid fa-book"></i>
+                            Registro de calçados
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("Contact", "Home")">
-                            Contato
+                            <i class="fa-solid fa-users"></i>
+                            Usuários
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="@Url.Action("SignOut", "Login")">
+                            <i class="fa-solid fa-user"></i>
+                            Perfil
                         </a>
                     </li>
                     <li>
                         <a href="@Url.Action("SignOut", "Login")">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
                             Sair
                         </a>
                     </li>
