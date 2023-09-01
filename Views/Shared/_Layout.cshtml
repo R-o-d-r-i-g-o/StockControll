@@ -11,6 +11,18 @@
 
     @* para pegar icones: https://fontawesome.com/search *@
 
+    <style>
+        .splitter {
+            display: none;
+        }
+
+        @@media (max-width: 767px) {
+            .splitter {
+                display: block;
+            }
+        }
+    </style>
+
     @Styles.Render("~/Content/css", "~/bundles/modernizr")
 </head>
 <body>
@@ -45,6 +57,7 @@
                         </a>
                     </li>
                 </ul>
+                <hr class="splitter"/>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <a href="@Url.Action("SignOut", "Login")">
