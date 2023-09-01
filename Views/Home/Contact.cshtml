@@ -6,13 +6,24 @@
 }
 
 <style>
+    .action-buttons {
+        max-width: 30%;
+        display: flex;
+        gap: 5px;
+        justify-content: space-around;
+    }
+
+    .modal-title {
+        display: contents;
+    }
+
     .pagination-container {
         display: flex;
     }
 
-    .pagination-container > ul {
-        margin-inline: auto;
-    }
+        .pagination-container > ul {
+            margin-inline: auto;
+        }
 </style>
 
 <h2>@ViewBag.Title.</h2>
@@ -25,7 +36,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Nome</th>
                 <th scope="col">Posição</th>
-                <th scope="col">hds</th>
+                <th scope="col">Botões de ação</th>
             </tr>
         </thead>
         <tbody class="table-group-divider">
@@ -35,7 +46,14 @@
                     <th scope="row">@user.Id</th>
                     <td>@user.Name</td>
                     <td>@user.UserType</td>
-                    <td>fjsdlkfj</td>
+                    <td>
+                        <div class="action-buttons">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </div>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -46,3 +64,57 @@
 <p>Página @Model.Filters.Page de @Model.Users.PageCount</p>
 
 @Html.PagedListPager(Model.Users, Page => Url.Action("Contact", new { Rows = Model.Filters.Rows, Page = Page }))
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Open Modal</button>
+
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="myForm">
+
+                <div class="modal-header">
+                    <h3 class="modal-title">Modal Header</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitForm() {
+        event.preventDefault();
+
+        console.log('veio aqui', event);
+
+        $("#myForm").submit();
+    }
+
+    $(document).ready(function () {
+        // Handle form submission
+        $("#myForm").submit(function (event) {
+            event.preventDefault();
+            // Perform form submission logic here
+
+            // Close the modal
+            $("#myModal").modal("hide");
+        });
+    });
+</script>
