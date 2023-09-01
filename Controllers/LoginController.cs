@@ -18,6 +18,11 @@ namespace StockControll.Controllers
             return View();
         }
 
+        public ActionResult Register()
+        {
+            return View("Register");
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult SignIn(UserViewModel loginForm)
@@ -31,7 +36,7 @@ namespace StockControll.Controllers
 
                 var user = _db.Users.FirstOrDefault(u => u.Name == loginForm.Name && u.Password == parsedPassword);
                 if (user == null)
-                    throw new Exception("Usuário não encontrado");
+                    throw new Exception(@"Usuário não encontrado");
 
                 Session["user"] = user;
                 return RedirectToAction("Index", "Home");
