@@ -1,4 +1,5 @@
 ﻿@model StockControll.ViewModel.UsersViewModel
+@using StockControll.Commons
 @using PagedList.Mvc
 
 @{
@@ -8,10 +9,23 @@
 }
 
 <style>
+    div.green {
+        background: green;
+    }
+
     .page-title {
         text-align: center;
         margin: 30px 0;
     }
+
+    .button-set {
+        display: flex;
+        gap: 10px;
+    }
+
+        .button-set button:nth-of-type(3) {
+            margin-left: auto;
+        }
 
     .weight-600 {
         font-weight: 600;
@@ -103,7 +117,7 @@
                 </div>*@
         }
     </div>
-    <div class="row" style="display: flex; gap: 10px;">
+    <div class="row button-set">
         <button id="btnShowFilters"
                 class="btn btn-primary">
             filtrar
@@ -115,6 +129,14 @@
             Gerar relatório
         </button>
 
+        <button type="button"
+                title="O filtro será gerado de acordo com os dados do filtro"
+                onclick="downloadExcelFile()"
+                class="btn btn-primary">
+            <i class="fa-solid fa-check"></i>
+            Novo usuário
+        </button>
+
     </div>
 </div>
 
@@ -124,10 +146,10 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Nome</th>
-                <th scope="col">Posição</th>
-                <th scope="col">Posição</th>
-                <th scope="col">Posição</th>
-                <th scope="col">Posição</th>
+                <th scope="col">E-mail</th>
+                <th scope="col">Cargo</th>
+                <th scope="col">Status</th>
+                <th scope="col">Criado em</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -137,10 +159,23 @@
                 <tr>
                     <th scope="row">@user.Id</th>
                     <td>@user.Name</td>
-                    <td>@user.UserType</td>
-                    <td>@user.UserType</td>
-                    <td>@user.UserType</td>
-                    <td>@user.UserType</td>
+                    <td>@user.Email</td>
+                    <td>@user.UserType.GetDescription()</td>
+                    <td>
+                        @if (user.DeletedAt.HasValue)
+                        {
+                            <div class="badge bg-primary text-wrap" style="width: 6rem;">
+                                inativo
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="badge bg-primary text-wrap green" style="width: 6rem;">
+                                Ativo
+                            </div>
+                        }
+                    </td>
+                    <td>@user.CreatedAt</td>
                     <td>
                         <div class="action-buttons">
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">

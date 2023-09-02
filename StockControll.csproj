@@ -138,6 +138,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Commons\AuthSettings.cs" />
     <Compile Include="Commons\Enums.cs" />
+    <Compile Include="Commons\Helpers.cs" />
     <Compile Include="Context\AppDbContext.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
