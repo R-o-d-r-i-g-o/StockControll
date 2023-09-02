@@ -292,6 +292,51 @@
         })
     }
 
+     function downloadExcelFile() {
+            Swal.fire({
+                title: "Confirmação",
+                text: "Deseja gerar o relatório dos valores da tela?",
+                icon: "info",
+                closeOnClickOutside: false,
+                closeOnEsc: false,
+                buttons: {
+                    confirm: { text: "Sim", value: true, closeModal: false },
+                    cancel: "Não"
+                }
+            }).then((res) => {
+                if (!res) return;
+
+                console.log('o que veio ', res)
+
+                $.ajax({
+                    url: '@Url.Action("GenerateReportFromTransactions", "Home")',
+                    method: 'POST',
+                    data: {
+                        SearchItem: '@(Model.Filters.SearchItem)',
+                        Rows: '@(Model.Filters.Rows)',
+                        Page: '@(Model.Filters.Page)',
+                    },
+                    xhrFields: {
+                        responseType: 'arraybuffer'
+                    },
+                    success: function (data) {
+                        var blob = new Blob([data], { type: 'application/octet-stream' });
+                        var url = window.URL.createObjectURL(blob);
+                        var linkElement = document.createElement('a');
+                        linkElement.href = url;
+                        linkElement.download = 'Relatório de usuários.xlsx';
+                        linkElement.click();
+                        window.URL.revokeObjectURL(url);
+
+                        Swal.fire("Download concluído!", "relatório baixado com sucesso", "success");
+                    },
+                    error: function () {
+                        Swal.fire("Ops ...", "Erro ao processar o download", "error");
+                    }
+                });
+            });
+        };
+
     $(document).ready(function () {
 
         $("#btnShowFilters").click(function () {
