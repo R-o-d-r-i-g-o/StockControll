@@ -4,8 +4,6 @@
 
 @{
     ViewBag.Title = "Usuários da aplicação";
-
-    var paginationOpitons = new int[] { 10, 20, 30, 50, 100 };
 }
 
 <style>
@@ -45,9 +43,15 @@
     .filters-container {
         display: none;
         width: 100%;
+        padding: 20px;
+        height: fit-content;
         margin-bottom: 10px;
         border: 1px solid black;
     }
+
+        .filters-container > row {
+            max-width: 100%;
+        }
 
     .button-delete {
         background: red !important;
@@ -71,56 +75,33 @@
         }
 </style>
 
-@Styles.Render("~/Content/bootstrap.min.css", "~/Content/site.css", "~/Content/sweetalert2.min.css")
-
+@Styles.Render("~/Content/bootstrap.min.css", "~/Content/bootstrap.theme.min.css", "~/Content/bootstrap.theme.min.css.map", "~/Content/bootstrap.css", "~/Content/site.css", "~/Content/sweetalert2.min.css")
 
 <h3 class="page-title weight-600">@ViewBag.Title</h3>
 <hr class="weight-600" />
 
 <div id="filters" class="filters">
     <div class="filters-container">
-        @using (Html.BeginForm("IndexEcsWithBillingLowerThan5k", "Reports", FormMethod.Get))
+        @using (Html.BeginForm("Contact", "Home", FormMethod.Get, new { @class = "row g-3", role = "form" }))
         {
-            <div class="row">
-                <div class="col">
-                    <input type="text" class="form-control" placeholder="First name" aria-label="First name">
-                </div>
-                <div class="col">
-                    <input type="text" class="form-control" placeholder="Last name" aria-label="Last name">
-                </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.Filters.SearchUser, new { @class = "form-label", @for = "user-name-search" })
+                @Html.TextBoxFor(m => m.Filters.SearchUser, new { @class = "form-control", @id = "user-name-search" })
+            </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.Filters.Rows, new { @class = "form-label", @for = "user-name-search" })
+                @Html.DropDownListFor(m => m.Filters.Rows, Model.Filters.GetPaginationOptions(), "Choose an option", new { @class = "form-control" })
             </div>
 
-            @*<div class="row">
-
-
-
-                    <div class="col s6 m3 inline">
-                        <label for="txtCnpj">Cnpj</label>
-                        <input type="text" id="txtCnpj" name="Cnpj" value="@Model.Filters.SearchItem" class="form-control" />
-                    </div>
-
-                    <div class="col s6 m3 inline">
-                        <label>Itens por página:</label>
-                        <select id="pageSize" onchange="changePageSize()" class="form-control">
-                            <option value="" disabled selected>Selecione uma opção</option>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                </div>*@
-
-            @*<div class="row">
-                    <div class="col s12 m3">
-                        <button type="submit" class="btn btn-primary submit-button">Filtrar</button>
-                    </div>
-                </div>*@
+            <div class="col-lg-12" style="text-align: right; margin-top: 10px;">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
         }
     </div>
     <div class="row button-set">
         <button id="btnShowFilters"
                 class="btn btn-primary">
-            filtrar
+            Filtros
         </button>
         <button type="button"
                 title="O filtro será gerado de acordo com os dados do filtro"
@@ -195,25 +176,6 @@
     </table>
 </div>
 
-@if (@Model.Users.TotalItemCount > 0)
-{
-    <p>Exibindo de @Model.Filters.Page até @Model.Users.PageCount de @Model.Users.TotalItemCount</p>
-
-    @Html.PagedListPager(Model.Users, Page => Url.Action("Contact", new
-    {
-        Rows = Model.Filters.Rows,
-        Page = Page
-    }),
-    new PagedListRenderOptions
-    {
-        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
-        DisplayLinkToLastPage = PagedListDisplayMode.Always,
-        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
-        DisplayLinkToNextPage = PagedListDisplayMode.Always,
-        MaximumPageNumbersToDisplay = 3
-    })
-}
-
 <div class="modal fade" id="myModal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -244,6 +206,25 @@
         </div>
     </div>
 </div>
+
+@if (@Model.Users.TotalItemCount > 0)
+{
+    <p>Exibindo de @Model.Filters.Page até @Model.Users.PageCount de @Model.Users.TotalItemCount</p>
+
+    @Html.PagedListPager(Model.Users, Page => Url.Action("Contact", new
+    {
+        Rows = Model.Filters.Rows,
+        Page = Page
+    }),
+    new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 3
+    })
+}
 
 @Scripts.Render("~/Content/code.jquery.com_jquery-3.7.1.min.js", "~/Content/sweetalert2.min.js")
 
