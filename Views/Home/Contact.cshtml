@@ -267,8 +267,14 @@
             cancelButtonText: 'Não',
             confirmButtonText: 'Sim, deletar'
         }).then(result => {
-            if (result.isDenied)
+
+
+            console.log(result)
+
+            if (!result.isConfirmed)
                 return;
+
+            console.log(result.isDenied)
 
             $.ajax({
                 url: "@Url.Action("DeleteUser", "Home")",

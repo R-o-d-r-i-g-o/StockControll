@@ -20,5 +20,16 @@ namespace StockControll.Commons
             Admin
         }
 
+        public enum ActivityType
+        {
+            [Description("Editar recursos")]
+            EditItems,
+
+            [Description("Deletar recursos")]
+            DeleteItems,
+
+            [Description("Outros")]
+            Other,
+        }
     }
 }

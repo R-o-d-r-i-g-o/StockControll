@@ -49,7 +49,7 @@ namespace StockControll.Controllers
             using (var transaction = _db.Database.BeginTransaction()) {
                 try {
                     var user = _db.Users.Find(userID);
-                    if (user != null)
+                    if (user == null)
                         throw new Exception("O usuário não foi encontrado");
 
                     // salvar logs aqui

@@ -1,4 +1,5 @@
 ﻿@using System.Reflection
+@using StockControll.Commons
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -80,7 +81,7 @@
 
         <footer class="text-center navbar-fixed-bottom">
             <hr />
-            <p>&copy; Última Atualização - @(Assembly.GetExecutingAssembly())</p>
+            <p>&copy; Última Atualização - @(Assembly.GetExecutingAssembly().GetLastBuildDateTime())</p>
         </footer>
     </div>
 

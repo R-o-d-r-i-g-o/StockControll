@@ -176,7 +176,12 @@
     <Compile Include="Migrations\202309012341353_saveInfoFromRegister.designer.cs">
       <DependentUpon>202309012341353_saveInfoFromRegister.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202309021727174_addATableToSaveLogs.cs" />
+    <Compile Include="Migrations\202309021727174_addATableToSaveLogs.designer.cs">
+      <DependentUpon>202309021727174_addATableToSaveLogs.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\Log.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\FilterViewModel.cs" />
@@ -261,6 +266,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202309012341353_saveInfoFromRegister.resx">
       <DependentUpon>202309012341353_saveInfoFromRegister.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202309021727174_addATableToSaveLogs.resx">
+      <DependentUpon>202309021727174_addATableToSaveLogs.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
