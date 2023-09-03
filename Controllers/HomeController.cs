@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using StockControll.Commons;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using System.Globalization;
 
 namespace StockControll.Controllers
 {
@@ -35,12 +36,48 @@ namespace StockControll.Controllers
 
         public ActionResult Contact(FilterViewModel filters)
         {
-            ViewBag.Message = "Your contact page.";
-
-            return View(new UsersViewModel {
+            return View("Contact", new UsersViewModel {
                 Filters = filters,
                 Users = GetUsers(filters),
             });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditUser(User user)
+        {
+            using (var transaction = _db.Database.BeginTransaction())
+            {
+                try {
+                    user.CPF = user.CPF.UnmaskOnlyNumbers();
+                    ModelState.SetModelValue("user.CPF", new ValueProviderResult(user.CPF, user.CPF, CultureInfo.InvariantCulture));
+
+                    if (!ModelState.IsValid)
+                        throw new Exception(@"Preencha o formulário corretamente");
+
+                    var passwordFormated = AuthSettings.CalculateMD5(user.Password);
+
+                    var registreduser = _db.Users.Find(user.Id);
+
+                    registreduser.CPF = user.CPF;
+                    registreduser.Name = user.Name;
+                    registreduser.Email = user.Email;
+                    registreduser.Password = passwordFormated;
+
+                    _db.Entry(user).State = EntityState.Modified;
+                    _db.SaveChanges();
+
+                    ViewBag.SuccessMessage = "Usuário editado com sucesso.";
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.ErrorMessage = (ex.InnerException ?? ex).Message;
+                    transaction.Rollback();
+                }
+            }
+
+            return Contact(new FilterViewModel());
         }
 
         [HttpPost]

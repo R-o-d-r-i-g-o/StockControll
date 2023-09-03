@@ -152,6 +152,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Commons\AuthSettings.cs" />
+    <Compile Include="Commons\Constants.cs" />
     <Compile Include="Commons\Enums.cs" />
     <Compile Include="Commons\Helpers.cs" />
     <Compile Include="Context\AppDbContext.cs" />

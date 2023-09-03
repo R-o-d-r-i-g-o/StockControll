@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace StockControll.Commons
 {
-    public class Enums
+    public static class Enums
     {
         public enum UserType
         {
-            [Description("Não configurado")]
-            notSetted,
-
             [Description("Usuário")]
-            normalOne,
+            normalUser,
 
             [Description("Admin.")]
             Admin
@@ -30,6 +28,16 @@ namespace StockControll.Commons
 
             [Description("Outros")]
             Other,
+        }
+
+        public static List<SelectListItem> GetUsertypeOptions(this Enums.UserType userType)
+        {
+            return Enum.GetValues(typeof(Enums.UserType)).Cast<Enums.UserType>().Select(u => new SelectListItem {
+                Text = u.GetDescription(),
+                Value = u.ToString(),
+                Selected = u == userType
+            })
+            .ToList();
         }
     }
 }

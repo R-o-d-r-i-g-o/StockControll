@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel;
 using System.Reflection;
-using System.Web;
+using System.Text.RegularExpressions;
 
 namespace StockControll.Commons
 {
@@ -23,5 +21,19 @@ namespace StockControll.Commons
 
             return value.ToString();
         }
+
+        // string formats
+
+        public static bool IsEmailValid(this string email) // format meets "d*****.@aluno.educ.al.gov.br" too.
+            => email.Length <= 50 && Regex.IsMatch(email, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,})+)$");
+
+        public static string AddMaskToCnpj(this string cnpj) 
+            => Regex.Replace(cnpj, @"(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})", "$1.$2.$3/$4-$5");
+
+        public static string AddMaskToCpf(this string cpf)
+            => Regex.Replace(cpf, @"(\d{3})(\d{3})(\d{3})(\d{2})", "$1.$2.$3-$4");
+
+        public static string UnmaskOnlyNumbers(this string value)
+            => Regex.Replace(value, @"[^\d]", "");
     }
 }
