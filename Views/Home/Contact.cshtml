@@ -195,7 +195,6 @@
 
                                             <div class="modal-body">
                                                 @Html.AntiForgeryToken()
-                                                @*@Html.EditorFor(_ => )*@
 
                                                 @Html.Hidden("user.Id", user.Id)
                                                 @Html.Hidden("user.CreatedAt", user.CreatedAt)
@@ -310,20 +309,21 @@
                 url: "@Url.Action("DeleteUser", "Home")",
                 type: "POST",
                 data: { userID },
-                success: function (data) {
+                success: async function (data) {
                     if (!data.success) {
                         Swal.fire('Ops ...', data.message, 'error')
                         return;
                     }
 
-                    Swal.fire({
+                    await Swal.fire({
                         title: 'Sucesso!',
                         text: 'Usuário deletado com sucesso.',
                         icon: 'success',
                     })
+
+                    location.reload();
                 },
-                error: (err) => Swal.fire('Ops ...', err.message, 'error',
-                )
+                error: (err) => Swal.fire('Ops ...', err.message, 'error')
             });
         })
     }
@@ -371,5 +371,21 @@
                     }
                 });
             });
-        };
+    };
+
+      $(document).ready(function () {
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+            <text>
+                Swal.fire('Ops...', '@ViewBag.ErrorMessage', 'error');
+            </text>
+        }
+
+        @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+        {
+            <text>
+                Swal.fire('Operação concluída', '@ViewBag.ErrorMessage', 'success');
+            </text>
+        }
+    });
 </script>

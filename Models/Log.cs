@@ -20,7 +20,7 @@ namespace StockControll.Models
         public ActivityType ActivityType { get; set; }
 
         [Required(ErrorMessage = "O campo email é obrigatório")]
-        public string message { get; set; }
+        public string Message { get; set; }
 
     }
 }

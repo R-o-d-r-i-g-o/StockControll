@@ -29,6 +29,7 @@ namespace StockControll.Models
 
         [Display(Name = "CPF")]
         [Column(TypeName = "VARCHAR"), StringLength(11)]
+        [RegularExpression(@"^\d{11}$", ErrorMessage = "CPF deve conter 11 dígitos numéricos.")]
         public string CPF { get; set; }
 
         [Display(Name = "Data de criação")]

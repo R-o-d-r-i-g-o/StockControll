@@ -50,19 +50,26 @@ namespace StockControll.Controllers
             {
                 try {
                     user.CPF = user.CPF.UnmaskOnlyNumbers();
-                    ModelState.SetModelValue("user.CPF", new ValueProviderResult(user.CPF, user.CPF, CultureInfo.InvariantCulture));
+                    ModelState["user.CPF"].Errors.Clear();
+
+                    if (!user.CPF.IsValidCPF())
+                        throw new Exception("O documento não é valido");
 
                     if (!ModelState.IsValid)
-                        throw new Exception(@"Preencha o formulário corretamente");
+                        throw new Exception("Preencha o formulário corretamente");
 
-                    var passwordFormated = AuthSettings.CalculateMD5(user.Password);
+                    if (!user.Email.IsEmailValid())
+                        throw new Exception("A estrutura do e-mail está errada");
 
-                    var registreduser = _db.Users.Find(user.Id);
+                    var registreduser = _db.Users.Find(user.Id) ?? new User();
 
                     registreduser.CPF = user.CPF;
                     registreduser.Name = user.Name;
                     registreduser.Email = user.Email;
-                    registreduser.Password = passwordFormated;
+
+                    registreduser.Password = (user.Password == user.Password.HidePassword())
+                        ? registreduser.Password
+                        : AuthSettings.CalculateMD5(user.Password);
 
                     _db.Entry(user).State = EntityState.Modified;
                     _db.SaveChanges();
@@ -89,7 +96,17 @@ namespace StockControll.Controllers
                     if (user == null)
                         throw new Exception("O usuário não foi encontrado");
 
-                    // salvar logs aqui
+                    var sessionUser = _db.Users.Find(_loggedUser.Id);
+                    if (sessionUser == null)
+                        throw new Exception("Usuário da sessão não encontrado");
+
+                    _db.Logs.Add(new Log {
+                        User = sessionUser,
+                        ActivityType = Enums.ActivityType.EditItems,
+                        Message = "fksfjksdjk"
+                    });
+
+                    user.DeletedAt = DateTime.Now;
 
                     _db.Entry(user).State = EntityState.Modified;
                     _db.SaveChanges();
