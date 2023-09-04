@@ -118,7 +118,8 @@
 
         <button type="button"
                 title="O filtro será gerado de acordo com os dados do filtro"
-                onclick="downloadExcelFile()"
+                data-toggle="modal"
+                data-target="#create-user-modal"
                 class="btn btn-primary">
             <i class="fa-solid fa-plus"></i>
             Novo usuário
@@ -147,12 +148,11 @@
                 {
                     // Obs.: Não mostar a senha do usuário
                     user.Password = user.Password.HidePassword();
-                    user.CPF = user.CPF.AddMaskToCpf();
                 }
                 <tr>
                     <th scope="row">@user.Id</th>
                     <td>@user.Name</td>
-                    <td>@user.CPF</td>
+                    <td>@user.CPF.AddMaskToCpf()</td>
                     <td>@user.Email</td>
                     <td>&bull; @user.UserType.GetDescription()</td>
                     <td>
@@ -207,7 +207,7 @@
                                                 </div>
                                                 <div class="form-group">
                                                     @Html.LabelFor(_ => user.CPF, new { @class = "form-label", @for = "user-name-search" })
-                                                    @Html.TextBoxFor(_ => user.CPF, new { @class = "form-control", @id = "user-name-search" })
+                                                    @Html.TextBoxFor(_ => user.CPF, new { @class = "form-control", @id = "user-name-search", maxlength = "11", @oninput = "RemoveSpecialCharacters(this)" })
                                                     @Html.ValidationMessageFor(_ => user.CPF)
                                                 </div>
                                                 <div class="form-group">
@@ -222,7 +222,7 @@
                                                 </div>
                                                 <div class="form-group">
                                                     @Html.LabelFor(_ => user.UserType, new { @class = "form-label", @for = "user-name-search" })
-                                                    @Html.DropDownListFor(_ => user.UserType, user.UserType.GetUsertypeOptions(), "Choose an option", new { @class = "form-control" })
+                                                    @Html.DropDownListFor(_ => user.UserType, Enums.GetUsertypeOptions(user.UserType), "Choose an option", new { @class = "form-control" })
                                                     @Html.ValidationMessageFor(_ => user.UserType)
                                                 </div>
                                             </div>
@@ -262,6 +262,59 @@
     })
 }
 
+@* Modal para criar usuário *@
+<div class="modal fade" id="create-user-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("CreateUser", "Home", FormMethod.Post, new { @id = $"create-user-form", role = "form" }))
+            {
+                <div class="modal-header">
+                    <h3 class="modal-title">Edição de usuário</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+
+                    @Html.Hidden("newUser.CreatedAt", DateTime.Now)
+                    @Html.Hidden("newUser.DeletedAt", null)
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NewUser.Name, new { @class = "form-label", @for = "user-name-search" })
+                        @Html.TextBoxFor(m => m.NewUser.Name, new { @class = "form-control", @id = "user-name-search" })
+                        @Html.ValidationMessageFor(m => m.NewUser.Name)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NewUser.CPF, new { @class = "form-label", @for = "user-name-search" })
+                        @Html.TextBoxFor(m => m.NewUser.CPF, new { @class = "form-control", @id = "user-name-search", maxlength = "11", @oninput = "RemoveSpecialCharacters(this)" })
+                        @Html.ValidationMessageFor(m => m.NewUser.CPF)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NewUser.Email, new { @class = "form-label", @for = "user-name-search" })
+                        @Html.TextBoxFor(m => m.NewUser.Email, new { @class = "form-control", @id = "user-name-search" })
+                        @Html.ValidationMessageFor(m => m.NewUser.Email)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NewUser.Password, new { @class = "form-label", @for = "user-name-search" })
+                        @Html.TextBoxFor(m => m.NewUser.Password, new { @class = "form-control", @id = "user-name-search" })
+                        @Html.ValidationMessageFor(m => m.NewUser.Password)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NewUser.UserType, new { @class = "form-label", @for = "user-name-search" })
+                        @Html.DropDownListFor(m => m.NewUser.UserType, Enums.GetUsertypeOptions(), "Choose an option", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.NewUser.UserType)
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" onclick="submitForm(this)">Salvar</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
 <script>
     function submitForm(submit) {
         event.preventDefault();
@@ -284,6 +337,7 @@
                 return;
             }
 
+            $(`#${modal.id}`).modal("hide");
             form.submit()
         })
     }
@@ -328,63 +382,76 @@
         })
     }
 
-     function downloadExcelFile() {
-            Swal.fire({
-                title: "Confirmação",
-                text: "Deseja gerar o relatório dos valores da tela?",
-                icon: "info",
-                closeOnClickOutside: false,
-                closeOnEsc: false,
-                buttons: {
-                    confirm: { text: "Sim", value: true, closeModal: false },
-                    cancel: "Não"
+    function downloadExcelFile() {
+        Swal.fire({
+            title: "Confirmação",
+            text: "Deseja gerar o relatório dos valores da tela?",
+            icon: "info",
+            closeOnClickOutside: false,
+            closeOnEsc: false,
+            buttons: {
+                confirm: { text: "Sim", value: true, closeModal: false },
+                cancel: "Não"
+            }
+        }).then((res) => {
+            if (!res) return;
+
+            console.log('o que veio ', res)
+
+            $.ajax({
+                url: '@Url.Action("GenerateReportFromTransactions", "Home")',
+                method: 'POST',
+                data: {
+                    SearchItem: '@(Model.Filters.SearchItem)',
+                    Rows: '@(Model.Filters.Rows)',
+                    Page: '@(Model.Filters.Page)',
+                },
+                xhrFields: {
+                    responseType: 'arraybuffer'
+                },
+                success: function (data) {
+                    var blob = new Blob([data], { type: 'application/octet-stream' });
+                    var url = window.URL.createObjectURL(blob);
+                    var linkElement = document.createElement('a');
+                    linkElement.href = url;
+                    linkElement.download = 'Relatório de usuários.xlsx';
+                    linkElement.click();
+                    window.URL.revokeObjectURL(url);
+
+                    Swal.fire("Download concluído!", "relatório baixado com sucesso", "success");
+                },
+                error: function () {
+                    Swal.fire("Ops ...", "Erro ao processar o download", "error");
                 }
-            }).then((res) => {
-                if (!res) return;
-
-                console.log('o que veio ', res)
-
-                $.ajax({
-                    url: '@Url.Action("GenerateReportFromTransactions", "Home")',
-                    method: 'POST',
-                    data: {
-                        SearchItem: '@(Model.Filters.SearchItem)',
-                        Rows: '@(Model.Filters.Rows)',
-                        Page: '@(Model.Filters.Page)',
-                    },
-                    xhrFields: {
-                        responseType: 'arraybuffer'
-                    },
-                    success: function (data) {
-                        var blob = new Blob([data], { type: 'application/octet-stream' });
-                        var url = window.URL.createObjectURL(blob);
-                        var linkElement = document.createElement('a');
-                        linkElement.href = url;
-                        linkElement.download = 'Relatório de usuários.xlsx';
-                        linkElement.click();
-                        window.URL.revokeObjectURL(url);
-
-                        Swal.fire("Download concluído!", "relatório baixado com sucesso", "success");
-                    },
-                    error: function () {
-                        Swal.fire("Ops ...", "Erro ao processar o download", "error");
-                    }
-                });
             });
+        });
     };
 
-      $(document).ready(function () {
+    function RemoveSpecialCharacters(input) {
+        var cleanedValue = input.value.replace(/[^\d]/g, '');
+        input.value = cleanedValue;
+    }
+
+    $(document).ready(function () {
         @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
         {
             <text>
-                Swal.fire('Ops...', '@ViewBag.ErrorMessage', 'error');
+              (async function () {
+                  await Swal.fire('Ops...', '@ViewBag.ErrorMessage', 'error');
+
+                  location.href = '@Url.Action("Contact", "Home")';
+              })()
             </text>
         }
 
         @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
         {
             <text>
-                Swal.fire('Operação concluída', '@ViewBag.ErrorMessage', 'success');
+              (async function () {
+                await Swal.fire('Operação concluída', '@ViewBag.SuccessMessage', 'success');
+
+                location.href = '@Url.Action("Contact", "Home")';
+              })()
             </text>
         }
     });

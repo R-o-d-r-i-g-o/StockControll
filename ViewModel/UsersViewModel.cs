@@ -7,5 +7,6 @@ namespace StockControll.ViewModel
     {
         public FilterViewModel Filters { get; set; }
         public IPagedList<User> Users { get; set; }
+        public User NewUser { get; set; }
     }
 }

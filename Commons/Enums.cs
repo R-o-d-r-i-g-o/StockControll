@@ -30,7 +30,7 @@ namespace StockControll.Commons
             Other,
         }
 
-        public static List<SelectListItem> GetUsertypeOptions(this Enums.UserType userType)
+        public static List<SelectListItem> GetUsertypeOptions(Enums.UserType? userType = null)
         {
             return Enum.GetValues(typeof(Enums.UserType)).Cast<Enums.UserType>().Select(u => new SelectListItem {
                 Text = u.GetDescription(),

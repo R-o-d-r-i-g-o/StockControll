@@ -36,6 +36,12 @@ namespace StockControll.Controllers
 
         public ActionResult Contact(FilterViewModel filters)
         {
+            if (ViewBag.ErrorMessage != null)
+                ViewBag.ErrorMessage = ViewBag.ErrorMessage;
+
+            if (ViewBag.SuccessMessage != null)
+                ViewBag.SuccessMessage = ViewBag.ErrorMessage;
+
             return View("Contact", new UsersViewModel {
                 Filters = filters,
                 Users = GetUsers(filters),
@@ -44,14 +50,48 @@ namespace StockControll.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public ActionResult CreateUser(User newUser)
+        {
+            using (var transaction = _db.Database.BeginTransaction()) {
+                try
+                {
+                    if (!newUser.CPF.IsValidCPF())
+                        throw new Exception("O documento não é valido");
+
+                    if (!ModelState.IsValid)
+                        throw new Exception("Preencha o formulário corretamente");
+
+                    if (!newUser.Email.IsEmailValid())
+                        throw new Exception("A estrutura do e-mail está errada");
+
+                    var alreadyCreated = _db.Users.Where(u => u.Email == newUser.Email || u.CPF == newUser.CPF).ToList();
+                    if (alreadyCreated == null)
+                        throw new Exception("Já existem usuários com esses dados cadastrados");
+
+                    newUser.Password = AuthSettings.CalculateMD5(newUser.Password);
+
+                    _db.Users.Add(newUser);
+                    _db.SaveChanges();
+
+                    ViewBag.SuccessMessage = "Usuário criado com sucesso.";
+                    transaction.Commit();
+                }
+                catch (Exception ex) {
+                    ViewBag.ErrorMessage = (ex.InnerException ?? ex).Message;
+                    transaction.Rollback();
+                }
+            }
+
+            return Contact(new FilterViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult EditUser(User user)
         {
-            using (var transaction = _db.Database.BeginTransaction())
-            {
-                try {
-                    user.CPF = user.CPF.UnmaskOnlyNumbers();
-                    ModelState["user.CPF"].Errors.Clear();
-
+            using (var transaction = _db.Database.BeginTransaction()) {
+                try
+                {
                     if (!user.CPF.IsValidCPF())
                         throw new Exception("O documento não é valido");
 
@@ -61,7 +101,9 @@ namespace StockControll.Controllers
                     if (!user.Email.IsEmailValid())
                         throw new Exception("A estrutura do e-mail está errada");
 
-                    var registreduser = _db.Users.Find(user.Id) ?? new User();
+                    var registreduser = _db.Users.Find(user.Id);
+                    if (registreduser == null)
+                        throw new Exception("O usuário não foi encontrado");
 
                     registreduser.CPF = user.CPF;
                     registreduser.Name = user.Name;
@@ -71,7 +113,7 @@ namespace StockControll.Controllers
                         ? registreduser.Password
                         : AuthSettings.CalculateMD5(user.Password);
 
-                    _db.Entry(user).State = EntityState.Modified;
+                    _db.Entry(registreduser).State = EntityState.Modified;
                     _db.SaveChanges();
 
                     ViewBag.SuccessMessage = "Usuário editado com sucesso.";
@@ -231,7 +273,12 @@ namespace StockControll.Controllers
         {
             filters.VerifyFilter();
 
-            return _db.Users.OrderBy(u => u.Id).ToPagedList(filters.Page, filters.Rows);
+            var query = _db.Users.Select(u => u);
+
+            if (!string.IsNullOrEmpty(filters.SearchUser))
+                query = query.Where(u => u.Name == filters.SearchUser);
+
+            return query.OrderBy(u => u.Id).ToPagedList(filters.Page, filters.Rows);
         }
     }
 }

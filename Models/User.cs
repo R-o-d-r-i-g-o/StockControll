@@ -27,7 +27,7 @@ namespace StockControll.Models
         [Required(ErrorMessage = "O cargo do usuário é obrigatório")]
         public UserType UserType { get; set; }
 
-        [Display(Name = "CPF")]
+        [Display(Name = "CPF (sem mascara)")]
         [Column(TypeName = "VARCHAR"), StringLength(11)]
         [RegularExpression(@"^\d{11}$", ErrorMessage = "CPF deve conter 11 dígitos numéricos.")]
         public string CPF { get; set; }
