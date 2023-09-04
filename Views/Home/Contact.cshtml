@@ -229,7 +229,7 @@
 
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                                                <button type="button" class="btn btn-primary" onclick="submitForm(this)">Salvar</button>
+                                                <button type="button" class="btn btn-primary" onclick="submitForm(this, 0)">Salvar</button>
                                             </div>
                                         }
                                     </div>
@@ -308,7 +308,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" onclick="submitForm(this)">Salvar</button>
+                    <button type="button" class="btn btn-primary" onclick="submitForm(this, 1)">Salvar</button>
                 </div>
             }
         </div>
@@ -316,12 +316,19 @@
 </div>
 
 <script>
-    function submitForm(submit) {
+    const actionType = Object.freeze({
+        Edit: 0,
+        Update: 1
+    });
+
+    function submitForm(submit, action) {
         event.preventDefault();
+
+        var isEditAction = action === actionType.Edit;
 
         Swal.fire({
             title: 'Uma pergunta ...',
-            text: 'Deseja enviar o formulário de edição?',
+            text: `Deseja enviar o formulário de ${isEditAction ? 'edição' : 'criação'}?`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -384,20 +391,10 @@
 
     function downloadExcelFile() {
         Swal.fire({
-            title: "Confirmação",
-            text: "Deseja gerar o relatório dos valores da tela?",
+            title: "Atenção!",
+            text: "O formulário será gerado dos valores em tela",
             icon: "info",
-            closeOnClickOutside: false,
-            closeOnEsc: false,
-            buttons: {
-                confirm: { text: "Sim", value: true, closeModal: false },
-                cancel: "Não"
-            }
-        }).then((res) => {
-            if (!res) return;
-
-            console.log('o que veio ', res)
-
+        }).then(() => {
             $.ajax({
                 url: '@Url.Action("GenerateReportFromTransactions", "Home")',
                 method: 'POST',
@@ -420,9 +417,7 @@
 
                     Swal.fire("Download concluído!", "relatório baixado com sucesso", "success");
                 },
-                error: function () {
-                    Swal.fire("Ops ...", "Erro ao processar o download", "error");
-                }
+                error: () => Swal.fire("Ops ...", "Erro ao processar o download", "error"),
             });
         });
     };

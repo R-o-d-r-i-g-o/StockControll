@@ -55,14 +55,7 @@ namespace StockControll.Controllers
             using (var transaction = _db.Database.BeginTransaction()) {
                 try
                 {
-                    if (!newUser.CPF.IsValidCPF())
-                        throw new Exception("O documento não é valido");
-
-                    if (!ModelState.IsValid)
-                        throw new Exception("Preencha o formulário corretamente");
-
-                    if (!newUser.Email.IsEmailValid())
-                        throw new Exception("A estrutura do e-mail está errada");
+                    VerifyInfo(newUser);
 
                     var alreadyCreated = _db.Users.Where(u => u.Email == newUser.Email || u.CPF == newUser.CPF).ToList();
                     if (alreadyCreated == null)
@@ -92,14 +85,7 @@ namespace StockControll.Controllers
             using (var transaction = _db.Database.BeginTransaction()) {
                 try
                 {
-                    if (!user.CPF.IsValidCPF())
-                        throw new Exception("O documento não é valido");
-
-                    if (!ModelState.IsValid)
-                        throw new Exception("Preencha o formulário corretamente");
-
-                    if (!user.Email.IsEmailValid())
-                        throw new Exception("A estrutura do e-mail está errada");
+                    VerifyInfo(user);
 
                     var registreduser = _db.Users.Find(user.Id);
                     if (registreduser == null)
@@ -267,6 +253,18 @@ namespace StockControll.Controllers
                     message = (ex.InnerException ?? ex).Message
                 });
             }
+        }
+
+        private void VerifyInfo(User user)
+        {
+            if (!user.CPF.IsValidCPF())
+                throw new Exception("O documento não é valido");
+
+            if (!user.Email.IsEmailValid())
+                throw new Exception("A estrutura do e-mail está errada");
+
+            if (!ModelState.IsValid)
+                throw new Exception("Preencha o formulário corretamente");
         }
 
         private IPagedList<User> GetUsers(FilterViewModel filters)
