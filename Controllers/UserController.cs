@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using PagedList;
 using StockControll.Commons;
 using StockControll.Context;
+using StockControll.Extensions;
 using StockControll.Models;
 using StockControll.ViewModel;
 
@@ -15,11 +15,11 @@ namespace StockControll.Controllers
 {
     public class UserController : Controller
     {
-        private readonly AppDbContext _db = new AppDbContext();
+        private static readonly AppDbContext _db = new AppDbContext();
+        private static readonly LogExtension _log = new LogExtension(_db);
 
-        private readonly User _loggedUser = (User)System.Web.HttpContext.Current.Session["user"];
 
-        public ActionResult Contact(FilterViewModel filters)
+        public ActionResult Index(FilterViewModel filters)
         {
             if (ViewBag.ErrorMessage != null)
                 ViewBag.ErrorMessage = ViewBag.ErrorMessage;
@@ -47,6 +47,11 @@ namespace StockControll.Controllers
 
                     newUser.Password = AuthSettings.CalculateMD5(newUser.Password);
 
+                    _log.AddMessage(
+                        Enums.ActivityType.CreateItems,
+                        $"O usuário criou um no usuário com o privilégio de { newUser.UserType.GetDescription() }"
+                    );
+
                     _db.Users.Add(newUser);
                     _db.SaveChanges();
 
@@ -59,7 +64,7 @@ namespace StockControll.Controllers
                 }
             }
 
-            return Contact(new FilterViewModel());
+            return Index(new FilterViewModel());
         }
 
         [HttpPost]
@@ -82,6 +87,11 @@ namespace StockControll.Controllers
                         ? registreduser.Password
                         : AuthSettings.CalculateMD5(user.Password);
 
+                    _log.AddMessage(
+                       Enums.ActivityType.EditItems,
+                       $"O usuário editou o usuário de id: { user.Id }"
+                    );
+
                     _db.Entry(registreduser).State = EntityState.Modified;
                     _db.SaveChanges();
 
@@ -94,7 +104,7 @@ namespace StockControll.Controllers
                 }
             }
 
-            return Contact(new FilterViewModel());
+            return Index(new FilterViewModel());
         }
 
         [HttpPost]
@@ -106,15 +116,10 @@ namespace StockControll.Controllers
                     if (user == null)
                         throw new Exception("O usuário não foi encontrado");
 
-                    var sessionUser = _db.Users.Find(_loggedUser.Id);
-                    if (sessionUser == null)
-                        throw new Exception("Usuário da sessão não encontrado");
-
-                    _db.Logs.Add(new Log {
-                        User = sessionUser,
-                        ActivityType = Enums.ActivityType.EditItems,
-                        Message = "fksfjksdjk"
-                    });
+                    _log.AddMessage(
+                       Enums.ActivityType.DeleteItems,
+                       $"O usuário deletou o usuário de id: {userID}"
+                    );
 
                     user.DeletedAt = DateTime.Now;
 

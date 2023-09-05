@@ -1,0 +1,66 @@
+﻿div.green {
+    background: green;
+}
+
+.page-title {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.button-set {
+    display: flex;
+    gap: 10px;
+}
+
+    .button-set button:nth-of-type(3) {
+        margin-left: auto;
+    }
+
+.weight-600 {
+    font-weight: 600;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.filters {
+    margin-bottom: 20px;
+}
+
+.filters-container {
+    display: none;
+    width: 100%;
+    padding: 20px;
+    height: fit-content;
+    margin-bottom: 10px;
+    border: 1px solid black;
+}
+
+    .filters-container > row {
+        max-width: 100%;
+    }
+
+.button-delete {
+    background: red !important;
+    border-color: red !important;
+}
+
+.fa-solid {
+    margin-right: 8px;
+}
+
+.modal-title {
+    display: contents;
+}
+
+.pagination-container {
+    display: flex;
+}
+
+    .pagination-container > ul {
+        margin-inline: auto;
+    }

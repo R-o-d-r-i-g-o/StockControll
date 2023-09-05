@@ -26,6 +26,9 @@ namespace StockControll.Commons
             [Description("Deletar recursos")]
             DeleteItems,
 
+            [Description("Criar recursos")]
+            CreateItems,
+
             [Description("Outros")]
             Other,
         }
