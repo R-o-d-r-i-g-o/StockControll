@@ -13,6 +13,7 @@ using StockControll.ViewModel;
 
 namespace StockControll.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         private static readonly AppDbContext _db = new AppDbContext();
@@ -86,11 +87,6 @@ namespace StockControll.Controllers
                     registreduser.Password = (user.Password == user.Password.HidePassword())
                         ? registreduser.Password
                         : AuthSettings.CalculateMD5(user.Password);
-
-                    _log.AddMessage(
-                       Enums.ActivityType.EditItems,
-                       $"O usuário editou o usuário de id: { user.Id }"
-                    );
 
                     _db.Entry(registreduser).State = EntityState.Modified;
                     _db.SaveChanges();

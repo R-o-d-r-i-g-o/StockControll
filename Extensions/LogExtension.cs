@@ -8,6 +8,7 @@ namespace StockControll.Extensions
 {
     public class LogExtension
     {
+        // *Obs.: Não usar dentro da controller de login pois os cookies não foram cofigurados ainda.
         private readonly AppDbContext _db;
         private readonly User _loggedUser;
 

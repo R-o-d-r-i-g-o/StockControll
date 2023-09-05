@@ -5,18 +5,15 @@ using System.Web.Security;
 using StockControll.Context;
 using StockControll.ViewModel;
 using StockControll.Commons;
-using StockControll.Extensions;
 
 namespace StockControll.Controllers
 {
     public class LoginController : Controller
     {
-        private static readonly AppDbContext _db = new AppDbContext();
-        private static readonly LogExtension _log = new LogExtension(_db);
+        private readonly AppDbContext _db = new AppDbContext();
 
         public ActionResult Index()
         {
-            ResetCookies();
             return View();
         }
 
@@ -37,11 +34,6 @@ namespace StockControll.Controllers
 
                 ResetCookies();
                 FormsAuthentication.SetAuthCookie(loginForm.Name, false);
-
-                _log.AddMessage(
-                    Enums.ActivityType.CreateItems,
-                    $"O usuário { user.Id } entrou no sistema"
-                );
 
                 Session["user"] = user;
                 return RedirectToAction("Index", "Home");
