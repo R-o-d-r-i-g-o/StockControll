@@ -193,8 +193,12 @@
     <Compile Include="Migrations\202309021727174_addATableToSaveLogs.designer.cs">
       <DependentUpon>202309021727174_addATableToSaveLogs.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202309102328145_addOtherTablesToRegisterShoesAndTags.cs" />
+    <Compile Include="Migrations\202309102328145_addOtherTablesToRegisterShoesAndTags.designer.cs">
+      <DependentUpon>202309102328145_addOtherTablesToRegisterShoesAndTags.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\BarCode.cs" />
+    <Compile Include="Models\Tag.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\Shoe.cs" />
     <Compile Include="Models\User.cs" />
@@ -287,6 +291,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202309021727174_addATableToSaveLogs.resx">
       <DependentUpon>202309021727174_addATableToSaveLogs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202309102328145_addOtherTablesToRegisterShoesAndTags.resx">
+      <DependentUpon>202309102328145_addOtherTablesToRegisterShoesAndTags.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

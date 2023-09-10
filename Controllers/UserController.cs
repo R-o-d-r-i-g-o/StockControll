@@ -22,7 +22,7 @@ namespace StockControll.Controllers
         public UserController()
         {
             this._db = new AppDbContext();
-            this. _log = new LogExtension(_db);
+            this._log = new LogExtension(_db);
         }
 
         public ActionResult Index(FilterViewModel filters)

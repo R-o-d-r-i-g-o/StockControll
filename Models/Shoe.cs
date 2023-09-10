@@ -9,16 +9,10 @@ namespace StockControll.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
-        public string Name { get; set; }
+        [Required(ErrorMessage = "O sapato deve estar vinculado a alguma etiqueta")]
+        public virtual Tag Tag { get; set; }
 
-        [Required]
-        public uint LastChange { get; set; }
-
-        [Required]
-        public uint Price { get; set; }
-
-        [Required]
-        public DateTime SoldAt { get; set; }
+        //[Required]
+        //public int LastChange { get; set; }
     }
 }
