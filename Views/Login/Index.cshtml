@@ -2,71 +2,81 @@
 
 @{
     ViewBag.Title = "Login";
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout_Auth.cshtml";
 }
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Your Application Name</title>
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.7/dist/sweetalert2.min.css" rel="stylesheet" />
+<style>
+    .glyphicon-eye-open {
+        cursor: pointer;
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #333; 
+    }
+</style>
 
-    @Styles.Render("~/Content/bootstrap.css", "~/Content/bootstrap.min.css", "~/Content/site.css", "~/Content/app_styles.css", "~/Content/sweetalert2.min.css")
-</head>
-<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2 class="panel-title">Login</h2>
+                </div>
+                <div class="panel-body">
+                    @using (Html.BeginForm("SignIn", "Login", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4 col-md-offset-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h2 class="panel-title">Login</h2>
-                    </div>
-                    <div class="panel-body">
-                        @using (Html.BeginForm("SignIn", "Login", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                        {
-                            @Html.AntiForgeryToken()
-
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.Name, new { @class = "col-md-3 control-label" })
-                                <div class="col-md-9">
-                                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
-                                    @Html.ValidationMessageFor(m => m.Name)
-                                </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Name, new { @class = "col-md-3 control-label" })
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.Name)
                             </div>
+                        </div>
 
-                            <div class="form-group">
-                                @Html.LabelFor(m => m.Password, new { @class = "col-md-3 control-label" })
-                                <div class="col-md-9">
-                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", id = "passwordInput" })
-                                    @Html.ValidationMessageFor(m => m.Password)
-
-                                    <br />
-                                    <a href="@Url.Action("Index", "Home")">
-                                        Ainda não possui login?
-                                    </a>
-                                </div>
+                        <div class="form-group">
+                            @Html.LabelFor(m => m.Password, new { @class = "col-md-3 control-label" })
+                            <div class="col-md-9">
+                                @Html.PasswordFor(m => m.Password, new { @class = "form-control", id = "passwordInput" })
+                                @Html.ValidationMessageFor(m => m.Password)
+                                <i onclick="showPassword()" id="eyeIcon" class="glyphicon glyphicon-eye-open"></i>
                             </div>
+                        </div>
 
-                            <div class="form-group">
-                                <div class="col-md-offset-3 col-md-9">
-                                    <button type="submit" class="btn btn-primary">Login</button>
-                                </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-9">
+                                <button type="submit" class="btn btn-primary">Login</button>
                             </div>
-                        }
-                    </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    @Scripts.Render("~/Content/code.jquery.com_jquery-3.7.1.min.js", "~/Content/sweetalert2.min.js")
+@Scripts.Render("~/Content/code.jquery.com_jquery-3.7.1.min.js", "~/Content/sweetalert2.min.js")
+
+@section Scripts {
+
+    @if (ViewBag.SuccessMessage != null)
+    {
+        <script>
+                Swal.fire("Operação concluída", `@Html.Raw($"{ViewBag.SuccessMessage}")`, "success");
+        </script>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <script>
+                Swal.fire("Ocorreu um erro", `@Html.Raw($"{ViewBag.ErrorMessage}")`, "error");
+        </script>
+    }
 
     <script>
-    $(document).ready(function () {
-        $('#showPasswordBtn').click(function () {
+        function showPassword() {
             var passwordInput = $('#passwordInput');
 
             if (passwordInput.attr('type') === 'password') {
@@ -74,19 +84,6 @@
             } else {
                 passwordInput.attr('type', 'password');
             }
-        });
-
-        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
-        {
-            <text>
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: '@ViewBag.ErrorMessage'
-            });
-            </text>
-        }
-    });
+        };
     </script>
-    </body>
-</html>
+}

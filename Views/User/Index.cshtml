@@ -84,7 +84,7 @@
                         @if (user.DeletedAt.HasValue)
                         {
                             <div class="badge bg-primary text-wrap" style="width: 6rem;">
-                                inativo
+                                Inativo
                             </div>
                         }
                         else
@@ -97,12 +97,12 @@
                     <td>@user.CreatedAt</td>
                     <td>
                         <div class="action-buttons">
-                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="@($"#edit-user-modal-{user.Id}")">
+                            <button type="button" @(user.DeletedAt.HasValue ? "disabled" : "") class="btn btn-primary" data-toggle="modal" data-target="@($"#edit-user-modal-{user.Id}")">
                                 <i class="fa-solid fa-pen-to-square"></i>
                                 Editar
                             </button>
 
-                            <button type="button" class="btn btn-primary button-delete" onclick="deleteRegister('@user.Id', '@user.Name')">
+                            <button type="button" @(user.DeletedAt.HasValue ? "disabled" : "") class="btn btn-primary button-delete" onclick="deleteRegister('@user.Id', '@user.Name')">
                                 <i class="fa-solid fa-xmark"></i>
                                 Deletar
                             </button>
@@ -111,7 +111,7 @@
                             <div class="modal fade" id="@($"edit-user-modal-{user.Id}")">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
-                                        @using (Html.BeginForm("EditUser", "User", FormMethod.Post, new { @id = $"edit-user-form-{user.Id}", role = "form" }))
+                                        @using (Html.BeginForm("EditUser", "User", FormMethod.Post, new { @onsubmit = "submitForm(this, 0)", @id = $"edit-user-form-{user.Id}", role = "form" }))
                                         {
                                             <div class="modal-header">
                                                 <h3 class="modal-title">Edição de usuário</h3>
@@ -154,7 +154,7 @@
 
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                                                <button type="button" class="btn btn-primary" onclick="submitForm(this, 0)">Salvar</button>
+                                                <button type="submit" class="btn btn-primary">Salvar</button>
                                             </div>
                                         }
                                     </div>
@@ -191,10 +191,10 @@
 <div class="modal fade" id="create-user-modal">
     <div class="modal-dialog">
         <div class="modal-content">
-            @using (Html.BeginForm("CreateUser", "User", FormMethod.Post, new { @id = $"create-user-form", role = "form" }))
+            @using (Html.BeginForm("CreateUser", "User", FormMethod.Post, new { @onsubmit = "submitForm(this, 1)", @id = $"create-user-form", role = "form" }))
             {
                 <div class="modal-header">
-                    <h3 class="modal-title">Edição de usuário</h3>
+                    <h3 class="modal-title">Criar novo usuário</h3>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
@@ -233,7 +233,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" onclick="submitForm(this, 1)">Salvar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
                 </div>
             }
         </div>

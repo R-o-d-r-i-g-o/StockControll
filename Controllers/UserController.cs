@@ -210,7 +210,7 @@ namespace StockControll.Controllers
                     col++;
 
                     ws.Cells[$"{col}{row}"].Style.Numberformat.Format = "@";
-                    ws.Cells[$"{col}{row}"].Value = $"{ u.CPF }";
+                    ws.Cells[$"{col}{row}"].Value = $"{ u.CPF.AddMaskToCpf() }";
                     col++;
 
                     ws.Cells[$"{col}{row}"].Style.Numberformat.Format = "@";
@@ -248,14 +248,14 @@ namespace StockControll.Controllers
 
         private void VerifyInfo(User user)
         {
-            if (!user.CPF.IsValidCPF())
-                throw new Exception("O documento não é valido");
+            if (!ModelState.IsValid)
+                throw new Exception("Preencha o formulário corretamente");
 
             if (!user.Email.IsEmailValid())
                 throw new Exception("A estrutura do e-mail está errada");
 
-            if (!ModelState.IsValid)
-                throw new Exception("Preencha o formulário corretamente");
+            if (!user.CPF.IsValidCPF())
+                throw new Exception("O documento não é valido");
         }
 
         private IPagedList<User> GetUsers(FilterViewModel filters)

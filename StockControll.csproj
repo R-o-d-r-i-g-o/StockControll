@@ -253,6 +253,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Tag\Index.cshtml" />
+    <Content Include="Views\Shared\_Layout_Auth.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Code\" />
