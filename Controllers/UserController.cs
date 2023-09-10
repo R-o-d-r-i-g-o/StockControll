@@ -16,17 +16,22 @@ namespace StockControll.Controllers
     [Authorize]
     public class UserController : Controller
     {
-        private static readonly AppDbContext _db = new AppDbContext();
-        private static readonly LogExtension _log = new LogExtension(_db);
+        private readonly AppDbContext _db;
+        private readonly LogExtension _log;
 
+        public UserController()
+        {
+            this._db = new AppDbContext();
+            this. _log = new LogExtension(_db);
+        }
 
         public ActionResult Index(FilterViewModel filters)
         {
-            if (ViewBag.ErrorMessage != null)
-                ViewBag.ErrorMessage = ViewBag.ErrorMessage;
+            if (TempData["ErrorMessage"] != null)
+                ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
 
-            if (ViewBag.SuccessMessage != null)
-                ViewBag.SuccessMessage = ViewBag.ErrorMessage;
+            if (TempData["SuccessMessage"] != null)
+                ViewBag.SuccessMessage = TempData["SuccessMessage"].ToString();
 
             return View("Index", new UsersViewModel {
                 Filters = filters,
@@ -56,16 +61,18 @@ namespace StockControll.Controllers
                     _db.Users.Add(newUser);
                     _db.SaveChanges();
 
-                    ViewBag.SuccessMessage = "Usuário criado com sucesso.";
+                    TempData["SuccessMessage"] = "Usuário criado com sucesso.";
                     transaction.Commit();
+
+                    return RedirectToAction("Index", "User");
                 }
                 catch (Exception ex) {
-                    ViewBag.ErrorMessage = (ex.InnerException ?? ex).Message;
+                    TempData["ErrorMessage"] = (ex.InnerException ?? ex).Message;
                     transaction.Rollback();
+
+                    return Index(new FilterViewModel());
                 }
             }
-
-            return Index(new FilterViewModel());
         }
 
         [HttpPost]
@@ -80,27 +87,28 @@ namespace StockControll.Controllers
                     if (registreduser == null)
                         throw new Exception("O usuário não foi encontrado");
 
+                    if (user.Password != user.Password.HidePassword())
+                        registreduser.Password = AuthSettings.CalculateMD5(user.Password);
+
                     registreduser.CPF = user.CPF;
                     registreduser.Name = user.Name;
                     registreduser.Email = user.Email;
 
-                    registreduser.Password = (user.Password == user.Password.HidePassword())
-                        ? registreduser.Password
-                        : AuthSettings.CalculateMD5(user.Password);
-
                     _db.Entry(registreduser).State = EntityState.Modified;
                     _db.SaveChanges();
 
-                    ViewBag.SuccessMessage = "Usuário editado com sucesso.";
+                    TempData["SuccessMessage"] = "Usuário editado com sucesso.";
                     transaction.Commit();
+
+                    return RedirectToAction("Index", "User");
                 }
                 catch (Exception ex) {
-                    ViewBag.ErrorMessage = (ex.InnerException ?? ex).Message;
+                    TempData["ErrorMessage"] = (ex.InnerException ?? ex).Message;
                     transaction.Rollback();
+
+                    return Index(new FilterViewModel());
                 }
             }
-
-            return Index(new FilterViewModel());
         }
 
         [HttpPost]

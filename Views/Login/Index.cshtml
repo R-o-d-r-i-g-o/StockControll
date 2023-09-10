@@ -5,8 +5,6 @@
     Layout = null;
 }
 
-@Styles.Render("~/Content/bootstrap.css", "~/Content/bootstrap.min.css", "~/Content/site.css", "~/Content/sweetalert2.min.css")
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,14 +13,7 @@
     <title>@ViewBag.Title - Your Application Name</title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.7/dist/sweetalert2.min.css" rel="stylesheet" />
 
-    @Styles.Render("~/Content/css", "~/bundles/modernizr")
-
-    <style>
-        .field-validation-error {
-            color: red;
-            font-size: 10px;
-        }
-    </style>
+    @Styles.Render("~/Content/bootstrap.css", "~/Content/bootstrap.min.css", "~/Content/site.css", "~/Content/app_styles.css", "~/Content/sweetalert2.min.css")
 </head>
 <body>
 

@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    @{ var test = true; }
+</head>
+<body>
+
+    @if (test)
+    {
+
+        <h1>Leitor de QR Code</h1>
+        <video id="qr-video" width="300" height="300" autoplay></video>
+        <div id="qr-result"></div>
+
+        <script src="https://cdn.rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+        <script>
+            const video = document.getElementById('qr-video');
+            const qrResult = document.getElementById('qr-result');
+
+            // Inicializar o leitor Instascan
+            const scanner = new Instascan.Scanner({ video: video });
+
+            // Adicionar um ouvinte para quando um código QR é escaneado
+            scanner.addListener('scan', function (content) {
+                qrResult.textContent = 'Conteúdo do QR code: ' + content;
+                console.log('Conteúdo do QR code no console: ' + content);
+            });
+
+            // Iniciar o leitor
+            Instascan.Camera.getCameras().then(function (cameras) {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]); // Use a primeira câmera disponível
+                } else {
+                    console.error('Nenhuma câmera encontrada.');
+                }
+            }).catch(function (error) {
+                console.error('Erro ao acessar a câmera: ' + error);
+            });
+        </script>
+
+    }
+    else
+    {
+        <h1>Leitor de Código de Barras</h1>
+        <video id="barcode-video" width="300" height="300" autoplay></video>
+        <div id="barcode-result"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+        <script>
+            const video = document.getElementById('barcode-video');
+            const barcodeResult = document.getElementById('barcode-result');
+
+            // Configuração do leitor de código de barras
+            Quagga.init({
+                inputStream: {
+                    name: 'Live',
+                    type: 'LiveStream',
+                    target: video,
+                },
+                decoder: {
+                    readers: ['code_128_reader', 'ean_reader', 'ean_8_reader'],
+                },
+            });
+
+            // Inicializar o leitor
+            Quagga.onDetected(function (result) {
+                const code = result.codeResult.code;
+                barcodeResult.textContent = 'Código de barras lido: ' + code;
+                console.log('Código de barras lido no console: ' + code);
+            });
+
+            Quagga.start();
+        </script>
+    }
+
+
+
+</body>
+
+</html>

@@ -14,7 +14,13 @@ namespace StockControll.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            if (TempData["ErrorMessage"] != null)
+                ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
+
+            if (TempData["SuccessMessage"] != null)
+                ViewBag.SuccessMessage = TempData["SuccessMessage"].ToString();
+
+            return View("Index");
         }
 
         [HttpPost]
@@ -24,13 +30,13 @@ namespace StockControll.Controllers
             try
             {
                 if (!ModelState.IsValid)
-                    throw new Exception(@"Preencha o formulário corretamente");
+                    throw new Exception("Preencha o formulário corretamente");
                
                 var parsedPassword = AuthSettings.CalculateMD5(loginForm.Password);
 
-                var user = _db.Users.FirstOrDefault(u => u.Name == loginForm.Name && u.Password == parsedPassword);
+                var user = _db.Users.FirstOrDefault(u => u.Name == loginForm.Name && u.Password == parsedPassword && !u.DeletedAt.HasValue);
                 if (user == null)
-                    throw new Exception(@"Usuário não encontrado");
+                    throw new Exception("Usuário não encontrado");
 
                 ResetCookies();
                 FormsAuthentication.SetAuthCookie(loginForm.Name, false);
@@ -40,9 +46,9 @@ namespace StockControll.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = (ex.InnerException ?? ex).Message;
+                TempData["ErrorMessage"] = (ex.InnerException ?? ex).Message;
 
-                return View("Index");
+                return Index();
             }
         }
 

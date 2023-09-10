@@ -1,4 +1,5 @@
 ﻿@using System.Reflection
+@using StockControll.Models
 @using StockControll.Commons
 
 <!DOCTYPE html>
@@ -25,9 +26,11 @@
         }
     </style>
 
+    @{ var user = (User)HttpContext.Current.Session["user"]; }
+
     @Styles.Render("~/Content/bootstrap.min.css", "~/Content/bootstrap.theme.min.css", "~/Content/bootstrap.theme.min.css.map", "~/Content/bootstrap.css", "~/Content/site.css", "~/Content/sweetalert2.min.css", "~/Content/app_styles.css")
 
-    @Scripts.Render("~/Content/code.jquery.com_jquery-3.7.1.min.js", "~/Content/sweetalert2.min.js")
+    @Scripts.Render("~/Content/code.jquery.com_jquery-3.7.1.min.js", "~/Content/sweetalert2.min.js", "~/Content/app_scripts.js")
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -48,26 +51,23 @@
                         </a>
                     </li>
                     <li>
-                        <a href="@Url.Action("About", "Home")">
+                        <a href="@Url.Action("Index", "Tag")">
                             <i class="fa-solid fa-tag"></i>
                             Etiquetas
                         </a>
                     </li>
-                    <li>
-                        <a href="@Url.Action("Index", "User")">
-                            <i class="fa-solid fa-users"></i>
-                            Usuários
-                        </a>
-                    </li>
+                    @if (user.UserType == Enums.UserType.Admin)
+                    {
+                        <li>
+                            <a href="@Url.Action("Index", "User")">
+                                <i class="fa-solid fa-users"></i>
+                                Usuários
+                            </a>
+                        </li>
+                    }
                 </ul>
-                <hr class="splitter"/>
+                <hr class="splitter" />
                 <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a href="@Url.Action("SignOut", "Login")">
-                            <i class="fa-solid fa-user"></i>
-                            Perfil
-                        </a>
-                    </li>
                     <li>
                         <a href="@Url.Action("SignOut", "Login")">
                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
