@@ -102,7 +102,7 @@
                                 Editar
                             </button>
 
-                            <button type="button" @(user.DeletedAt.HasValue ? "disabled" : "") class="btn btn-primary button-delete" onclick="deleteRegister('@user.Id', '@user.Name')">
+                            <button type="button" @(user.DeletedAt.HasValue ? "disabled" : "") class="btn btn-danger" onclick="deleteRegister('@user.Id', '@user.Name')">
                                 <i class="fa-solid fa-xmark"></i>
                                 Deletar
                             </button>
