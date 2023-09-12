@@ -16,11 +16,13 @@ namespace StockControll.Models
         [Required(ErrorMessage = "O usuário deve estar vinculado ao registro")]
         public virtual User User { get; set; }
 
+        [Required(ErrorMessage = "O campo da data do registro é obrigatório")]
+        public DateTime CreatedAt { get; set; }
+
         [Required(ErrorMessage = "O campo tipo de atividade é obrigatório")]
         public ActivityType ActivityType { get; set; }
 
         [Required(ErrorMessage = "O campo email é obrigatório")]
         public string Message { get; set; }
-
     }
 }

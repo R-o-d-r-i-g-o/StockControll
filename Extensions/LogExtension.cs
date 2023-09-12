@@ -24,9 +24,11 @@ namespace StockControll.Extensions
             if (sessionUser == null)
                 throw new Exception("Usuário da sessão não encontrado");
 
-            _db.Logs.Add(new Log {
+            _db.Logs.Add(new Log
+            {
                 User = sessionUser,
                 Message = message,
+                CreatedAt = DateTime.Now,
                 ActivityType = activityType,
             });
             _db.SaveChanges();
