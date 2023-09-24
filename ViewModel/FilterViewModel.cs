@@ -16,8 +16,17 @@ namespace StockControll.ViewModel
         public int Page { get; set; }
         public string SearchItem { get; set; }
 
-        [Display(Name = "Procurar por usuário")]
+        [Display(Name = "Usuário")]
         public string SearchUser { get; set; }
+
+        [Display(Name = "Cor do conjunto")]
+        public string SearchColor { get; set; }
+
+        [Display(Name = "Tipo de solado")]
+        public string SearchSole { get; set; }
+
+        [Display(Name = "Nome do modelo")]
+        public string SearchCategoryName { get; set; }
 
         public List<SelectListItem> GetPaginationOptions()
         {

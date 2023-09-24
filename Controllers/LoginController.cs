@@ -34,7 +34,7 @@ namespace StockControll.Controllers
                
                 var parsedPassword = AuthSettings.CalculateMD5(loginForm.Password);
 
-                var returnUrl = Session["ReturnUrl"] as string;
+                var lastPerformed = Session["ReturnUrl"] as string;
 
                 var user = _db.Users.FirstOrDefault(u => u.Name == loginForm.Name && u.Password == parsedPassword && !u.DeletedAt.HasValue);
                 if (user == null)
@@ -45,10 +45,10 @@ namespace StockControll.Controllers
 
                 Session["user"] = user;
 
-                if (!string.IsNullOrEmpty(returnUrl))
-                    return RedirectToAction("Index", returnUrl);
-
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(
+                    actionName: "Index",
+                    controllerName: lastPerformed ?? "Home"
+                );
             }
             catch (Exception ex)
             {

@@ -1,0 +1,298 @@
+﻿@model StockControll.ViewModel.CategoryViewModel
+@using StockControll.Commons
+@using PagedList.Mvc
+
+@{ ViewBag.Title = "Modelos de calçados"; }
+
+<style>
+    .space-between {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .margin-top-10 {
+        margin-top: 10px;
+    }
+</style>
+
+<h3 class="page-title weight-600">@ViewBag.Title</h3>
+<hr class="weight-600" />
+
+<div id="filters" class="filters">
+    <div class="filters-container">
+        @using (Html.BeginForm("Index", "Category", FormMethod.Get, new { @class = "row g-3", role = "form" }))
+        {
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.Filters.SearchCategoryName, new { @class = "form-label", @for = "user-name-search" })
+                @Html.TextBoxFor(m => m.Filters.SearchCategoryName, new { @class = "form-control", @id = "user-name-search" })
+            </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.Filters.SearchColor, new { @class = "form-label", @for = "user-name-search" })
+                @Html.TextBoxFor(m => m.Filters.SearchColor, new { @class = "form-control", @id = "user-name-search" })
+            </div>
+
+            <div class="col-md-6 margin-top-10">
+                @Html.LabelFor(m => m.Filters.SearchSole, new { @class = "form-label", @for = "user-name-search" })
+                @Html.TextBoxFor(m => m.Filters.SearchSole, new { @class = "form-control", @id = "user-name-search" })
+            </div>
+            <div class="col-md-6 margin-top-10">
+                @Html.LabelFor(m => m.Filters.Rows, new { @class = "form-label", @for = "user-name-search" })
+                @Html.DropDownListFor(m => m.Filters.Rows, Model.Filters.GetPaginationOptions(), "Escolha uma opção de paginação", new { @class = "form-control" })
+            </div>
+
+            <div class="col-lg-12" style="text-align: right; margin-top: 10px;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-check"></i>
+                    Filtrar
+                </button>
+            </div>
+        }
+    </div>
+    <div class="row button-set">
+        <button id="btnShowFilters"
+                onclick="$('.filters-container').slideToggle();"
+                class="btn btn-primary">
+            Filtros
+        </button>
+        <button type="button"
+                title="O filtro será gerado de acordo com os dados do filtro"
+                onclick="downloadExcelFile()"
+                class="btn btn-primary">
+            Gerar relatório
+        </button>
+
+        <button type="button"
+                title="O filtro será gerado de acordo com os dados do filtro"
+                data-toggle="modal"
+                data-target="#create-category-modal"
+                class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i>
+            Novo modelo
+        </button>
+
+    </div>
+</div>
+
+<div class="panel-group" id="accordion">
+    @if (Model.Categories.TotalItemCount > 0)
+    {
+        foreach (var user in Model.Categories)
+        {
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@user.Id">
+                        <h4 class="panel-title space-between">
+                            @user.Name
+                            <span class="badge">@user.Id</span>
+                        </h4>
+                    </a>
+                </div>
+                <div id="collapse-@user.Id" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div class="text-right">
+                            <button class="btn btn-primary">Novo produto</button>
+                        </div>
+                        <br />
+
+
+                        <div class="alert alert-warning text-center">
+                            <strong>Aviso:</strong> Não existem produtos vinculados a este modelo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-warning text-center">
+            <strong>Aviso:</strong> Não há registros disponíveis.
+        </div>
+    }
+</div>
+
+
+@if (@Model.Categories.TotalItemCount > 0)
+{
+    <p>Exibindo de @Model.Filters.Page até @Model.Categories.PageCount de @Model.Categories.TotalItemCount</p>
+
+    @Html.PagedListPager(Model.Categories, Page => Url.Action("Index", "Category", new
+    {
+        Rows = Model.Filters.Rows,
+        Page = Page
+    }),
+    new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 3
+    })
+}
+
+
+@* Modal para criar usuário *@
+<div class="modal fade" id="create-category-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("CreateCategory", "Category", FormMethod.Post, new { @onsubmit = "submitForm(this, 1)", @id = $"create-user-form", role = "form" }))
+            {
+                <div class="modal-header">
+                    <h3 class="modal-title">Criar novo modelo de produto</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+
+                    @Html.Hidden("newUser.CreatedAt", DateTime.Now)
+                    @Html.Hidden("newUser.DeletedAt", null)
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NewCategory.Name, new { @class = "form-label", @for = "new-user-name" })
+                        @Html.TextBoxFor(m => m.NewCategory.Name, new { @class = "form-control", @id = "new-user-name" })
+                        @Html.ValidationMessageFor(m => m.NewCategory.Name)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NewCategory.Color, new { @class = "form-label", @for = "new-user-cpf" })
+                        @Html.TextBoxFor(m => m.NewCategory.Color, new { @class = "form-control", @id = "new-user-cpf", maxlength = "11", @oninput = "RemoveSpecialCharacters(this)" })
+                        @Html.ValidationMessageFor(m => m.NewCategory.Color)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NewCategory.Sole, new { @class = "form-label", @for = "new-user-email" })
+                        @Html.TextBoxFor(m => m.NewCategory.Sole, new { @class = "form-control", @id = "new-user-email" })
+                        @Html.ValidationMessageFor(m => m.NewCategory.Sole)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.NewCategory.Description, new { @class = "form-label", @for = "new-user-password" })
+                        @Html.TextBoxFor(m => m.NewCategory.Description, new { @class = "form-control", @id = "new-user-password" })
+                        @Html.ValidationMessageFor(m => m.NewCategory.Description)
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    @if (ViewBag.SuccessMessage != null)
+    {
+        <script>
+            Swal.fire("Operação concluída", `@Html.Raw($"{ViewBag.SuccessMessage}")`, "success");
+        </script>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <script>
+            Swal.fire("Ocorreu um erro", `@Html.Raw($"{ViewBag.ErrorMessage}")`, "error");
+        </script>
+    }
+
+    <script>
+
+    </script>
+}
+
+
+@*@if (test)
+    {
+
+        <h1>Leitor de QR Code</h1>
+        <video id="qr-video" width="300" height="300" autoplay></video>
+        <div id="qr-result"></div>
+
+        <script src="https://cdn.rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+        <script>
+            const video = document.getElementById('qr-video');
+            const qrResult = document.getElementById('qr-result');
+
+            // Inicializar o leitor Instascan
+            const scanner = new Instascan.Scanner({ video: video });
+
+            // Adicionar um ouvinte para quando um código QR é escaneado
+            scanner.addListener('scan', function (content) {
+                qrResult.textContent = 'Conteúdo do QR code: ' + content;
+                console.log('Conteúdo do QR code no console: ' + content);
+            });
+
+            // Iniciar o leitor
+            Instascan.Camera.getCameras().then(function (cameras) {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]); // Use a primeira câmera disponível
+                } else {
+                    console.error('Nenhuma câmera encontrada.');
+                }
+            }).catch(function (error) {
+                console.error('Erro ao acessar a câmera: ' + error);
+            });
+        </script>
+
+    }
+
+    @if (test2)
+    {
+        <h1>Leitor de Código de Barras</h1>
+        <video id="barcode-video" width="300" height="300" autoplay></video>
+        <div id="barcode-result"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+        <script>
+            const video = document.getElementById('barcode-video');
+            const barcodeResult = document.getElementById('barcode-result');
+
+            // Configuração do leitor de código de barras
+            Quagga.init({
+                inputStream: {
+                    name: 'Live',
+                    type: 'LiveStream',
+                    target: video,
+                },
+                decoder: {
+                    readers: ['code_128_reader', 'ean_reader', 'ean_8_reader'],
+                },
+            });
+
+            // Inicializar o leitor
+            Quagga.onDetected(function (result) {
+                const code = result.codeResult.code;
+                barcodeResult.textContent = 'Código de barras lido: ' + code;
+                console.log('Código de barras lido no console: ' + code);
+            });
+
+            Quagga.start();
+        </script>
+    }
+
+    @if (test3)
+    {
+        <h1>Gerador de QR Code</h1>
+        <input type="text" id="text-input" placeholder="Texto para gerar o QR Code">
+        <button onclick="generateQRCode()">Gerar QR Code</button>
+        <br>
+        <canvas id="qr-code-canvas" width="300" height="300"></canvas>
+
+        <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+        <script>
+            function generateQRCode() {
+                const text = document.getElementById('text-input').value;
+                const qrCodeCanvas = document.getElementById('qr-code-canvas');
+
+                if (text.trim() !== '') {
+                    const qr = new QRious({
+                        element: qrCodeCanvas,
+                        value: text,
+                        size: 300
+                    });
+                }
+            }
+        </script>
+    }*@
