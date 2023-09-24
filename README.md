@@ -2,6 +2,9 @@
 
 Este projeto consiste em um sistema de controle de estoque desenvolvido em C# para atender às necessidades de gerenciamento de uma sapataria. O sistema foi projetado para auxiliar na gestão do inventário de produtos, otimizando o controle de estoque e facilitando as operações diárias da sapataria.
 
+## Modelagem do banco
+![image](https://github.com/R-o-d-r-i-g-o/StockControll/assets/89111957/02f3649d-2ecf-4908-baa0-4e086ffa49dc)
+
 ## Recursos Principais
 Cadastro de Produtos: Os administradores têm a capacidade de cadastrar novos produtos, especificando informações como nome do sapato, descrição, tamanho, preço e quantidade disponível.
 
