@@ -34,6 +34,8 @@ namespace StockControll.Controllers
                
                 var parsedPassword = AuthSettings.CalculateMD5(loginForm.Password);
 
+                var returnUrl = Session["ReturnUrl"] as string;
+
                 var user = _db.Users.FirstOrDefault(u => u.Name == loginForm.Name && u.Password == parsedPassword && !u.DeletedAt.HasValue);
                 if (user == null)
                     throw new Exception("Usuário não encontrado");
@@ -42,6 +44,10 @@ namespace StockControll.Controllers
                 FormsAuthentication.SetAuthCookie(loginForm.Name, false);
 
                 Session["user"] = user;
+
+                if (!string.IsNullOrEmpty(returnUrl))
+                    return RedirectToAction("Index", returnUrl);
+
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
