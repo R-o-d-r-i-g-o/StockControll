@@ -201,8 +201,13 @@
     <Compile Include="Migrations\202309122029353_addADateTimeFieldInLogTable.designer.cs">
       <DependentUpon>202309122029353_addADateTimeFieldInLogTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202309240141235_AddShoeCategoryAndSaleTablesCompletely.cs" />
+    <Compile Include="Migrations\202309240141235_AddShoeCategoryAndSaleTablesCompletely.designer.cs">
+      <DependentUpon>202309240141235_AddShoeCategoryAndSaleTablesCompletely.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\Tag.cs" />
+    <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\Sale.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\Shoe.cs" />
     <Compile Include="Models\User.cs" />
@@ -303,6 +308,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202309122029353_addADateTimeFieldInLogTable.resx">
       <DependentUpon>202309122029353_addADateTimeFieldInLogTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202309240141235_AddShoeCategoryAndSaleTablesCompletely.resx">
+      <DependentUpon>202309240141235_AddShoeCategoryAndSaleTablesCompletely.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

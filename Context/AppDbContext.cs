@@ -11,7 +11,9 @@ namespace StockControll.Context
 
         public DbSet<Log> Logs { get; set; }
 
-        public DbSet<Tag> Tags { get; set; }
+        public DbSet<Sale> Sales { get; set; }
+
+        public DbSet<Category> Categories { get; set; }
 
         public AppDbContext() : base("name=DefaultConnection") { }
     }
