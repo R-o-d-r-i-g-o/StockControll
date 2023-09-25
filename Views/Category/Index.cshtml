@@ -2,7 +2,11 @@
 @using StockControll.Commons
 @using PagedList.Mvc
 
-@{ ViewBag.Title = "Modelos de calçados"; }
+@{
+    var listOfSizes = new int[] { 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 };
+
+    ViewBag.Title = "Modelos de calçados";
+}
 
 <style>
     .space-between {
@@ -76,29 +80,69 @@
 <div class="panel-group" id="accordion">
     @if (Model.Categories.TotalItemCount > 0)
     {
-        foreach (var user in Model.Categories)
+        foreach (var category in Model.Categories)
         {
+            var shoesIncluded = category.Shoes.Count();
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@user.Id">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@category.Id">
                         <h4 class="panel-title space-between">
-                            @user.Name
-                            <span class="badge">@user.Id</span>
+                            @category.Name
+                            <span class="badge">@shoesIncluded</span>
                         </h4>
                     </a>
                 </div>
-                <div id="collapse-@user.Id" class="panel-collapse collapse">
+                <div id="collapse-@category.Id" class="panel-collapse collapse">
                     <div class="panel-body">
                         <div class="text-right">
                             <button class="btn btn-primary">Novo produto</button>
                         </div>
                         <br />
 
+                        @if (shoesIncluded > 0)
+                        {
+                            <div class="text-center">
+                                @foreach (var size in listOfSizes)
+                                {
+                                    <span class="badge">
+                                        @size <br /><br />
+                                        @(category.ShoesBySize.ContainsKey(size) ? @category.ShoesBySize[size] : 0)
+                                    </span>
+                                }
+                            </div>
+                            <br />
 
-                        <div class="alert alert-warning text-center">
-                            <strong>Aviso:</strong> Não existem produtos vinculados a este modelo.
-                        </div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Código de barra</th>
+                                        <th scope="col">Preço</th>
+                                        <th scope="col">Tamanho</th>
+                                        <th scope="col">Referência</th>
+                                        <th scope="col">Data de criação</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    @foreach (var shoe in category.Shoes)
+                                    {
+                                        <tr>
+                                            <th scope="row">@shoe.BarCodeHash</th>
+                                            <td>@shoe.Price</td>
+                                            <td>@shoe.Size</td>
+                                            <td>@shoe.SizeId</td>
+                                            <td>@shoe.CreatedAt</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning text-center">
+                                <strong>Aviso:</strong> Não existem produtos vinculados a este modelo.
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -107,7 +151,7 @@
     else
     {
         <div class="alert alert-warning text-center">
-            <strong>Aviso:</strong> Não há registros disponíveis.
+            <strong>Aviso:</strong> Não foram encontrados registros disponíveis.
         </div>
     }
 </div>
@@ -133,7 +177,7 @@
 }
 
 
-@* Modal para criar usuário *@
+@* Modal para criar categoria *@
 <div class="modal fade" id="create-category-modal">
     <div class="modal-dialog">
         <div class="modal-content">

@@ -13,6 +13,7 @@ using StockControll.ViewModel;
 
 namespace StockControll.Controllers
 {
+    [Authorize]
     public class CategoryController : Controller
     {
         private readonly AppDbContext _db;
@@ -88,7 +89,20 @@ namespace StockControll.Controllers
             if (!string.IsNullOrEmpty(filters.SearchCategoryName))
                 query = query.Where(c => c.Name == filters.SearchCategoryName);
 
-            return query.OrderBy(c => c.Id).ToPagedList(filters.Page, filters.Rows);
+            var exect = query.OrderBy(c => c.Id).ToPagedList(filters.Page, filters.Rows);
+
+            var idRange = exect.Select(e => e.Id).ToList();
+
+            var shoes = _db.Shoes.Where(s => idRange.Contains(s.Category.Id)).ToList();
+
+            foreach (var category in exect)
+            {
+                category.Shoes = shoes.Where(s => s.Category.Id == category.Id).ToList();
+
+                category.ShoesBySize = category.Shoes.GroupBy(s => s.Size).ToDictionary(group => group.Key, group => group.Count());
+            }
+
+            return exect;
         }
     }
 }

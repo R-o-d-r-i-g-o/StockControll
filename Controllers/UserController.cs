@@ -94,6 +94,11 @@ namespace StockControll.Controllers
                     registreduser.Name = user.Name;
                     registreduser.Email = user.Email;
 
+                    _log.AddMessage(
+                        Enums.ActivityType.EditItems,
+                        $"O usuário editou o outro de nome { user.Name } e código { user.Id }"
+                    );
+
                     _db.Entry(registreduser).State = EntityState.Modified;
                     _db.SaveChanges();
 

@@ -28,5 +28,11 @@ namespace StockControll.Models
         [Required]
         [Display(Name = "Descrição do modelo")]
         public string Description { get; set; }
+
+        [NotMapped]
+        public virtual List<Shoe> Shoes { get; set; }
+
+        [NotMapped]
+        public virtual Dictionary<int, int> ShoesBySize { get; set; }
     }
 }
