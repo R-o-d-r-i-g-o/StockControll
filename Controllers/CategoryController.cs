@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
@@ -72,6 +73,150 @@ namespace StockControll.Controllers
                     return Index(new FilterViewModel());
                 }
             }
+        }
+
+        [HttpPost]
+        public ActionResult GenerateReportOfCategories(FilterViewModel filters)
+        {
+            try {
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+                var fileName = "Relatório de usuários";
+                var categories = GetCategories(filters);
+
+                var excelPackage = new ExcelPackage();
+                var ws = excelPackage.Workbook.Worksheets.Add(fileName);
+
+                var listOfSizes = new int[] { 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 };
+
+                // Título
+                ws.Cells["A1"].Value = "RELATÓRIO DOS USUÁRIOS DA APLICAÇÃO";
+                ws.Cells["A1"].Style.Font.Size = 16;
+                ws.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                // Detalhes da pesquisa
+                ws.Cells["A3"].Value = "Nº da página: ";
+                ws.Cells["B3"].Value = $"{ filters.Page }";
+                ws.Cells["A4"].Value = "Nº de itens p/ pág:";
+                ws.Cells["B4"].Value = $"{ filters.Rows }";
+                ws.Cells["A5"].Value = "Total de registros:";
+                ws.Cells["B5"].Value = $"{ categories.TotalItemCount }";
+
+                // Cabeçalho do relatório
+                ws.Cells[8, 1, 9, 34].Style.Numberformat.Format = "@";
+                ws.Cells[8, 1, 9, 34].Value = "";
+                ws.Cells[8, 1, 9, 34].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                ws.Cells[8, 1, 9, 34].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                ws.Cells[8, 1, 9, 34].Style.Font.Bold = true;
+                ws.Cells[8, 1, 9, 34].Style.Font.Size = 12;
+                ws.Cells["A7:A9"].Merge = true;
+                ws.Cells["B7:B9"].Merge = true;
+                ws.Cells["C7:C9"].Merge = true;
+                ws.Cells["D7:D9"].Merge = true;
+                ws.Cells["E7:Y8"].Merge = true;
+
+                // Colunas do relatório
+                // ws.Cells["A8"].Value = "Código";
+                ws.Cells["A8"].Value = "Produto";
+                ws.Cells["B8"].Value = "Cor";
+                ws.Cells["C8"].Value = "Modelo do solado";
+                ws.Cells["D8"].Value = "Descrição";
+                ws.Cells["E8"].Value = "Tamanhos dos calçados";
+
+                // tamanhos dos calçados
+                ws.Cells["E9"].Value = "33";
+                ws.Cells["F9"].Value = "34";
+                ws.Cells["G9"].Value = "35";
+                ws.Cells["H9"].Value = "36";
+                ws.Cells["I9"].Value = "37";
+                ws.Cells["J9"].Value = "38";
+                ws.Cells["K9"].Value = "39";
+                ws.Cells["L9"].Value = "40";
+                ws.Cells["M9"].Value = "41";
+                ws.Cells["N9"].Value = "42";
+                ws.Cells["O9"].Value = "43";
+                ws.Cells["P9"].Value = "44";
+                ws.Cells["Q9"].Value = "45";
+                ws.Cells["R9"].Value = "46";
+                ws.Cells["S9"].Value = "47";
+                ws.Cells["T9"].Value = "48";
+                ws.Cells["U9"].Value = "49";
+                ws.Cells["V9"].Value = "50";
+                ws.Cells["W9"].Value = "51";
+                ws.Cells["X9"].Value = "52";
+                ws.Cells["Y9"].Value = "Total";
+
+                // dados da tabela
+                char col = 'A';
+                var row = 9;
+
+                if (categories == null || !categories.Any())
+                    throw new Exception("Não tem dados para consulta");
+
+                foreach (var c in categories) {
+                    col = 'A';
+                    row++;
+
+                    ws.Cells[$"{col}{row}"].Style.Numberformat.Format = "@";
+                    ws.Cells[$"{col}{row}"].Value = $"{ c.Name }";
+                    col++;
+
+                    ws.Cells[$"{col}{row}"].Style.Numberformat.Format = "@";
+                    ws.Cells[$"{col}{row}"].Value = $"{ c.Color }";
+                    col++;
+
+                    ws.Cells[$"{col}{row}"].Style.Numberformat.Format = "@";
+                    ws.Cells[$"{col}{row}"].Value = $"{ c.Sole }";
+                    col++;
+
+                    ws.Cells[$"{col}{row}"].Style.Numberformat.Format = "@";
+                    ws.Cells[$"{col}{row}"].Value = $"{ c.Description ?? "--" }";
+                    col++;
+
+                    foreach (var size in listOfSizes)
+                    {
+                        ws.Cells[$"{col}{row}"].Style.Numberformat.Format = "@";
+                        ws.Cells[$"{col}{row}"].Value = $"{ FormatGridItem(c.ShoesBySize, size) }";
+                        col++;
+                    }
+
+                    ws.Cells[$"{col}{row}"].Style.Numberformat.Format = "@";
+                    ws.Cells[$"{col}{row}"].Value = $"{ FormatNumber(c.Shoes.Count()) }";
+                    col++;
+                }
+
+                ws.Column(01).Width = 20;
+                ws.Column(02).Width = 25;
+                ws.Column(03).Width = 25;
+                ws.Column(04).Width = 25;
+                ws.Column(34).Width = 15;
+
+                byte[] file = excelPackage.GetAsByteArray();
+
+                return File(file, "application/octet-stream", fileName);
+            }
+            catch (Exception ex) {
+                return Json(new {
+                    status = "error",
+                    message = (ex.InnerException ?? ex).Message
+                });
+            }
+        }
+
+        private string FormatNumber(int number)
+        {
+            if (number <= 0)
+                return string.Empty;
+
+            return number.ToString();
+        }
+
+        private string FormatGridItem(Dictionary<int, int> groupedInfo, int dic)
+        {
+            if (!groupedInfo.ContainsKey(dic))
+                return string.Empty;
+
+            return groupedInfo[dic].ToString();
         }
 
         private IPagedList<Category> GetCategories(FilterViewModel filters)

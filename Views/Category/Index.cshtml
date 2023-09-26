@@ -242,7 +242,38 @@
     }
 
     <script>
+         function downloadExcelFile() {
+            Swal.fire({
+                title: "Atenção!",
+                text: "O formulário será gerado dos valores em tela",
+                icon: "info",
+            }).then(() => {
+                $.ajax({
+                    url: '@Url.Action("GenerateReportOfCategories", "Category")',
+                    method: 'POST',
+                    data: {
+                        SearchItem: '@(Model.Filters.SearchItem)',
+                        Rows: '@(Model.Filters.Rows)',
+                        Page: '@(Model.Filters.Page)',
+                    },
+                    xhrFields: {
+                        responseType: 'arraybuffer'
+                    },
+                    success: function (data) {
+                        var blob = new Blob([data], { type: 'application/octet-stream' });
+                        var url = window.URL.createObjectURL(blob);
+                        var linkElement = document.createElement('a');
+                        linkElement.href = url;
+                        linkElement.download = 'Relatório de produtos.xlsx';
+                        linkElement.click();
+                        window.URL.revokeObjectURL(url);
 
+                        Swal.fire("Download concluído!", "relatório baixado com sucesso", "success");
+                    },
+                    error: () => Swal.fire("Ops ...", "Erro ao processar o download", "error"),
+                });
+            });
+        };
     </script>
 }
 
