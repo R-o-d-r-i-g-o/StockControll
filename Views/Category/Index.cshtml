@@ -96,6 +96,10 @@
                 <div id="collapse-@category.Id" class="panel-collapse collapse">
                     <div class="panel-body">
                         <div class="text-right">
+                            <button class="btn btn-primary" data-toggle="modal" data-target="@($"#edit-category-modal-{category.Id}")" id="openModalBtn">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+
                             <button class="btn btn-primary">Novo produto</button>
                         </div>
                         <br />
@@ -113,29 +117,44 @@
                             </div>
                             <br />
 
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Código de barra</th>
-                                        <th scope="col">Preço</th>
-                                        <th scope="col">Tamanho</th>
-                                        <th scope="col">Referência</th>
-                                        <th scope="col">Data de criação</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="table-group-divider">
-                                    @foreach (var shoe in category.Shoes)
-                                    {
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
                                         <tr>
-                                            <th scope="row">@shoe.BarCodeHash</th>
-                                            <td>@shoe.Price</td>
-                                            <td>@shoe.Size</td>
-                                            <td>@shoe.SizeId</td>
-                                            <td>@shoe.CreatedAt</td>
+                                            <th scope="col">Código de barra</th>
+                                            <th scope="col">Preço</th>
+                                            <th scope="col">Tamanho</th>
+                                            <th scope="col">Referência</th>
+                                            <th scope="col">Data de criação</th>
+                                            <th scope="col"></th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody class="table-group-divider">
+                                        @foreach (var shoe in category.Shoes)
+                                        {
+                                            <tr>
+                                                <th scope="row">@shoe.BarCodeHash</th>
+                                                <td>@shoe.Price</td>
+                                                <td>@shoe.Size</td>
+                                                <td>@shoe.SizeId</td>
+                                                <td>@shoe.CreatedAt</td>
+                                                <td>
+                                                    <i class="fa-solid fa-pen-to-square"
+                                                       aria-hidden="true"
+                                                       style="color: blue; "
+                                                       data-toggle="modal"
+                                                       data-target="@($"#edit-category-modal-{category.Id}")"
+                                                       title="Editar o calçado"
+                                                       id="openModalBtn">
+                                                    </i>
+
+                                                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         }
                         else
                         {
@@ -143,6 +162,53 @@
                                 <strong>Aviso:</strong> Não existem produtos vinculados a este modelo.
                             </div>
                         }
+                    </div>
+
+                    @* Modal para editar usuário *@
+                    <div class="modal fade" id="@($"edit-category-modal-{category.Id}")">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                @using (Html.BeginForm("Edit", "Category", FormMethod.Post, new { @onsubmit = "submitForm(this, 0)", @id = $"edit-category-form-{category.Id}", role = "form" }))
+                                {
+                                    <div class="modal-header">
+                                        <h3 class="modal-title">Edição de usuário</h3>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        @Html.AntiForgeryToken()
+
+                                        @Html.Hidden("user.Id", category.Id)
+
+                                        <div class="form-group">
+                                            @Html.LabelFor(_ => category.Name, new { @class = "form-label", @for = $"category-name-{category.Id}" })
+                                            @Html.TextBoxFor(_ => category.Name, new { @class = "form-control", @id = $"category-name-{category.Id}" })
+                                            @Html.ValidationMessageFor(_ => category.Name)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(_ => category.Color, new { @class = "form-label", @for = $"category-color-{category.Id}" })
+                                            @Html.TextBoxFor(_ => category.Color, new { @class = "form-control", @id = $"category-color-{category.Id}" })
+                                            @Html.ValidationMessageFor(_ => category.Color)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(_ => category.Sole, new { @class = "form-label", @for = $"category-sole-{category.Id}" })
+                                            @Html.TextBoxFor(_ => category.Sole, new { @class = "form-control", @id = $"category-sole-{category.Id}" })
+                                            @Html.ValidationMessageFor(_ => category.Sole)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(_ => category.Description, new { @class = "form-label", @for = $"category-description-{category.Id}" })
+                                            @Html.TextBoxFor(_ => category.Description, new { @class = "form-control", @id = $"category-description-{category.Id}" })
+                                            @Html.ValidationMessageFor(_ => category.Description)
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                                        <button type="submit" class="btn btn-primary">Salvar</button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
