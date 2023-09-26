@@ -103,48 +103,49 @@ namespace StockControll.Controllers
                 ws.Cells["B5"].Value = $"{ categories.TotalItemCount }";
 
                 // Cabeçalho do relatório
-                ws.Cells[8, 1, 9, 34].Style.Numberformat.Format = "@";
-                ws.Cells[8, 1, 9, 34].Value = "";
-                ws.Cells[8, 1, 9, 34].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                ws.Cells[8, 1, 9, 34].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                ws.Cells[8, 1, 9, 34].Style.Font.Bold = true;
-                ws.Cells[8, 1, 9, 34].Style.Font.Size = 12;
+                ws.Cells[8, 1, 9, 35].Style.Numberformat.Format = "@";
+                ws.Cells[8, 1, 9, 35].Value = "";
+                ws.Cells[8, 1, 9, 35].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                ws.Cells[8, 1, 9, 35].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                ws.Cells[8, 1, 9, 35].Style.Font.Bold = true;
+                ws.Cells[8, 1, 9, 35].Style.Font.Size = 12;
                 ws.Cells["A7:A9"].Merge = true;
                 ws.Cells["B7:B9"].Merge = true;
                 ws.Cells["C7:C9"].Merge = true;
                 ws.Cells["D7:D9"].Merge = true;
-                ws.Cells["E7:Y8"].Merge = true;
+                ws.Cells["E7:E9"].Merge = true;
+                ws.Cells["F7:Z8"].Merge = true;
 
                 // Colunas do relatório
-                // ws.Cells["A8"].Value = "Código";
-                ws.Cells["A8"].Value = "Produto";
-                ws.Cells["B8"].Value = "Cor";
-                ws.Cells["C8"].Value = "Modelo do solado";
-                ws.Cells["D8"].Value = "Descrição";
-                ws.Cells["E8"].Value = "Tamanhos dos calçados";
+                ws.Cells["A8"].Value = "Código";
+                ws.Cells["B8"].Value = "Produto";
+                ws.Cells["C8"].Value = "Cor";
+                ws.Cells["D8"].Value = "Modelo do solado";
+                ws.Cells["E8"].Value = "Descrição";
+                ws.Cells["F8"].Value = "Tamanhos dos calçados";
 
                 // tamanhos dos calçados
-                ws.Cells["E9"].Value = "33";
-                ws.Cells["F9"].Value = "34";
-                ws.Cells["G9"].Value = "35";
-                ws.Cells["H9"].Value = "36";
-                ws.Cells["I9"].Value = "37";
-                ws.Cells["J9"].Value = "38";
-                ws.Cells["K9"].Value = "39";
-                ws.Cells["L9"].Value = "40";
-                ws.Cells["M9"].Value = "41";
-                ws.Cells["N9"].Value = "42";
-                ws.Cells["O9"].Value = "43";
-                ws.Cells["P9"].Value = "44";
-                ws.Cells["Q9"].Value = "45";
-                ws.Cells["R9"].Value = "46";
-                ws.Cells["S9"].Value = "47";
-                ws.Cells["T9"].Value = "48";
-                ws.Cells["U9"].Value = "49";
-                ws.Cells["V9"].Value = "50";
-                ws.Cells["W9"].Value = "51";
-                ws.Cells["X9"].Value = "52";
-                ws.Cells["Y9"].Value = "Total";
+                ws.Cells["F9"].Value = "33";
+                ws.Cells["G9"].Value = "34";
+                ws.Cells["H9"].Value = "35";
+                ws.Cells["I9"].Value = "36";
+                ws.Cells["J9"].Value = "37";
+                ws.Cells["K9"].Value = "38";
+                ws.Cells["L9"].Value = "39";
+                ws.Cells["M9"].Value = "40";
+                ws.Cells["N9"].Value = "41";
+                ws.Cells["O9"].Value = "42";
+                ws.Cells["P9"].Value = "43";
+                ws.Cells["Q9"].Value = "44";
+                ws.Cells["R9"].Value = "45";
+                ws.Cells["S9"].Value = "46";
+                ws.Cells["T9"].Value = "47";
+                ws.Cells["U9"].Value = "48";
+                ws.Cells["V9"].Value = "49";
+                ws.Cells["W9"].Value = "50";
+                ws.Cells["X9"].Value = "51";
+                ws.Cells["Y9"].Value = "52";
+                ws.Cells["Z9"].Value = "Total";
 
                 // dados da tabela
                 char col = 'A';
@@ -156,6 +157,10 @@ namespace StockControll.Controllers
                 foreach (var c in categories) {
                     col = 'A';
                     row++;
+
+                    ws.Cells[$"{col}{row}"].Style.Numberformat.Format = "@";
+                    ws.Cells[$"{col}{row}"].Value = $"{ c.Id }";
+                    col++;
 
                     ws.Cells[$"{col}{row}"].Style.Numberformat.Format = "@";
                     ws.Cells[$"{col}{row}"].Value = $"{ c.Name }";
@@ -189,6 +194,7 @@ namespace StockControll.Controllers
                 ws.Column(02).Width = 25;
                 ws.Column(03).Width = 25;
                 ws.Column(04).Width = 25;
+                ws.Column(05).Width = 25;
                 ws.Column(34).Width = 15;
 
                 byte[] file = excelPackage.GetAsByteArray();
