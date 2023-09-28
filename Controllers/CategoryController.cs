@@ -359,7 +359,6 @@ namespace StockControll.Controllers
                 ws.Column(03).Width = 25;
                 ws.Column(04).Width = 25;
                 ws.Column(05).Width = 25;
-                ws.Column(34).Width = 15;
 
                 byte[] file = excelPackage.GetAsByteArray();
 
