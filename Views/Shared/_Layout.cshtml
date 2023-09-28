@@ -19,6 +19,10 @@
             display: none;
         }
 
+        .align-page-bottom {
+            padding-bottom: 30px;
+        }
+
         @@media (max-width: 767px) {
             .splitter {
                 display: block;
@@ -84,7 +88,7 @@
             </div>
         </div>
     </div>
-    <div class="container body-content">
+    <div class="container body-content align-page-bottom">
         @RenderBody()
 
         <footer class="text-center navbar-fixed-bottom">

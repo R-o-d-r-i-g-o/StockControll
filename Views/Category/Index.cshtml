@@ -1,5 +1,6 @@
 ﻿@model StockControll.ViewModel.CategoryViewModel
 @using StockControll.Commons
+@using Newtonsoft.Json;
 @using PagedList.Mvc
 
 @{
@@ -9,6 +10,10 @@
 }
 
 <style>
+    .usability-button {
+        cursor: pointer;
+    }
+
     .space-between {
         display: flex;
         justify-content: space-between;
@@ -96,11 +101,17 @@
                 <div id="collapse-@category.Id" class="panel-collapse collapse">
                     <div class="panel-body">
                         <div class="text-right">
-                            <button class="btn btn-primary" data-toggle="modal" data-target="@($"#edit-category-modal-{category.Id}")" id="openModalBtn">
-                                <i class="fas fa-info-circle"></i>
+                            <button class="btn btn-primary"
+                                    data-toggle="modal"
+                                    data-target="@($"#edit-category-modal-{category.Id}")">
+                                <i class="fa fa-pen-to-square"></i>
                             </button>
 
-                            <button class="btn btn-primary">Novo produto</button>
+                            <button class="btn btn-primary"
+                                    data-toggle="modal"
+                                    data-target="@($"#create-shoe-modal-{category.Id}")">
+                                Novo produto
+                            </button>
                         </div>
                         <br />
 
@@ -139,16 +150,64 @@
                                                 <td>@shoe.SizeId</td>
                                                 <td>@shoe.CreatedAt</td>
                                                 <td>
-                                                    <i class="fa-solid fa-pen-to-square"
+                                                    <i class="usability-button fa-solid fa-pen-to-square"
                                                        aria-hidden="true"
-                                                       style="color: blue; "
+                                                       style="color: blue;"
                                                        data-toggle="modal"
-                                                       data-target="@($"#edit-category-modal-{category.Id}")"
-                                                       title="Editar o calçado"
-                                                       id="openModalBtn">
+                                                       data-target="@($"#edit-shoe-modal-{shoe.BarCodeHash}")"
+                                                       title="Editar o calçado">
+                                                    </i>
+                                                    <i class="usability-button fa-solid fa-paper-plane"
+                                                       style="color: green;"
+                                                       onclick="submitSelling('@shoe.BarCodeHash')"
+                                                       title="registrar venda de produto">
                                                     </i>
 
-                                                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                                                    @* Modal para editar calçado *@
+                                                    <div class="modal fade" id="@($"edit-shoe-modal-{shoe.BarCodeHash}")">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                @using (Html.BeginForm("EditShoe", "Category", FormMethod.Post, new { @onsubmit = "submitForm(this, 0)", @id = $"edit-category-form-{category.Id}", role = "form" }))
+                                                                {
+                                                                    <div class="modal-header">
+                                                                        <h3 class="modal-title">Editar calçado</h3>
+                                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                                    </div>
+
+                                                                    <div class="modal-body">
+                                                                        @Html.AntiForgeryToken()
+
+                                                                        @Html.Hidden("shoe.SizeId", "BRL")
+
+                                                                        @Html.Hidden("olderHashCode", shoe.BarCodeHash)
+
+                                                                        @Html.Hidden("shoe.BarCodeHash", shoe.BarCodeHash)
+
+                                                                        <div class="form-group">
+                                                                            @Html.LabelFor(_ => shoe.BarCodeHash, new { @class = "form-label", @for = $"shoe-barcode-{category.Id}" })
+                                                                            @Html.TextBoxFor(_ => shoe.BarCodeHash, new { @class = "form-control", @id = $"shoe-barcode-{category.Id}", @disabled = true })
+                                                                            @Html.ValidationMessageFor(_ => shoe.BarCodeHash)
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            @Html.LabelFor(_ => shoe.Price, new { @class = "form-label", @for = $"shoe-price-{category.Id}" })
+                                                                            @Html.TextBoxFor(_ => shoe.Price, new { @class = "form-control", @id = $"shoe-price-{category.Id}" })
+                                                                            @Html.ValidationMessageFor(_ => shoe.Price)
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            @Html.LabelFor(_ => shoe.Size, new { @class = "form-label", @for = $"shoe-size-{category.Id}" })
+                                                                            @Html.TextBoxFor(_ => shoe.Size, new { @class = "form-control", @id = $"shoe-size-{category.Id}" })
+                                                                            @Html.ValidationMessageFor(_ => shoe.Size)
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                                                                        <button type="submit" class="btn btn-primary">Salvar</button>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         }
@@ -164,21 +223,67 @@
                         }
                     </div>
 
-                    @* Modal para editar usuário *@
-                    <div class="modal fade" id="@($"edit-category-modal-{category.Id}")">
+                    @* Modal para criar modelo produto *@
+                    <div class="modal fade" id="@($"create-shoe-modal-{category.Id}")">
                         <div class="modal-dialog">
                             <div class="modal-content">
-                                @using (Html.BeginForm("Edit", "Category", FormMethod.Post, new { @onsubmit = "submitForm(this, 0)", @id = $"edit-category-form-{category.Id}", role = "form" }))
+                                @using (Html.BeginForm("CreateShoe", "Category", FormMethod.Post, new { @onsubmit = "submitForm(this, 0)", @id = $"create-category-form-{category.Id}", role = "form" }))
                                 {
                                     <div class="modal-header">
-                                        <h3 class="modal-title">Edição de usuário</h3>
+                                        <h3 class="modal-title">Criar modelo de produto</h3>
                                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                                     </div>
 
                                     <div class="modal-body">
                                         @Html.AntiForgeryToken()
 
-                                        @Html.Hidden("user.Id", category.Id)
+                                        @Html.Hidden("newShoe.SizeId", "BRL")
+
+                                        @Html.Hidden("newShoe.CreatedAt", DateTime.Now)
+
+                                        @Html.Hidden("newShoe.Category.Id", category.Id)
+
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.newShoe.BarCodeHash, new { @class = "form-label", @for = $"shoe-barcode-{category.Id}" })
+                                            @Html.TextBoxFor(m => m.newShoe.BarCodeHash, new { @class = "form-control", @id = $"shoe-barcode-{category.Id}" })
+                                            @Html.ValidationMessageFor(m => m.newShoe.BarCodeHash)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.newShoe.Price, new { @class = "form-label", @for = $"shoe-price-{category.Id}" })
+                                            @Html.TextBoxFor(m => m.newShoe.Price, new { @class = "form-control", @id = $"shoe-price-{category.Id}" })
+                                            @Html.ValidationMessageFor(m => m.newShoe.Price)
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.newShoe.Size, new { @class = "form-label", @for = $"shoe-size-{category.Id}" })
+                                            @Html.TextBoxFor(m => m.newShoe.Size, new { @class = "form-control", @id = $"shoe-size-{category.Id}" })
+                                            @Html.ValidationMessageFor(m => m.newShoe.Size)
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                                        <button type="submit" class="btn btn-primary">Salvar</button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Modal para editar modelo produto *@
+                    <div class="modal fade" id="@($"edit-category-modal-{category.Id}")">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                @using (Html.BeginForm("EditCategory", "Category", FormMethod.Post, new { @id = $"create-category-form-{category.Id}", role = "form" }))
+                                {
+                                    <div class="modal-header">
+                                        <h3 class="modal-title">Editar modelo de produto</h3>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        @Html.AntiForgeryToken()
+
+                                        @Html.Hidden("category.Id", category.Id)
 
                                         <div class="form-group">
                                             @Html.LabelFor(_ => category.Name, new { @class = "form-label", @for = $"category-name-{category.Id}" })
@@ -242,7 +347,6 @@
     })
 }
 
-
 @* Modal para criar categoria *@
 <div class="modal fade" id="create-category-modal">
     <div class="modal-dialog">
@@ -257,9 +361,6 @@
                 <div class="modal-body">
                     @Html.AntiForgeryToken()
 
-                    @Html.Hidden("newUser.CreatedAt", DateTime.Now)
-                    @Html.Hidden("newUser.DeletedAt", null)
-
                     <div class="form-group">
                         @Html.LabelFor(m => m.NewCategory.Name, new { @class = "form-label", @for = "new-user-name" })
                         @Html.TextBoxFor(m => m.NewCategory.Name, new { @class = "form-control", @id = "new-user-name" })
@@ -267,7 +368,7 @@
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(m => m.NewCategory.Color, new { @class = "form-label", @for = "new-user-cpf" })
-                        @Html.TextBoxFor(m => m.NewCategory.Color, new { @class = "form-control", @id = "new-user-cpf", maxlength = "11", @oninput = "RemoveSpecialCharacters(this)" })
+                        @Html.TextBoxFor(m => m.NewCategory.Color, new { @class = "form-control", @id = "new-user-cpf" })
                         @Html.ValidationMessageFor(m => m.NewCategory.Color)
                     </div>
                     <div class="form-group">
@@ -277,7 +378,7 @@
                     </div>
                     <div class="form-group">
                         @Html.LabelFor(m => m.NewCategory.Description, new { @class = "form-label", @for = "new-user-password" })
-                        @Html.TextBoxFor(m => m.NewCategory.Description, new { @class = "form-control", @id = "new-user-password" })
+                        @Html.TextAreaFor(m => m.NewCategory.Description, new { @class = "form-control", @id = "new-user-password" })
                         @Html.ValidationMessageFor(m => m.NewCategory.Description)
                     </div>
                 </div>
@@ -308,7 +409,49 @@
     }
 
     <script>
-         function downloadExcelFile() {
+        async function submitSelling(barcode) {
+            const { value: text, dismiss: isCanceled } = await Swal.fire({
+                title: 'Retirada de item do estoque',
+                input: 'textarea',
+                inputLabel: 'Deseja salvar uma observação junto?',
+                inputPlaceholder: 'Digite algo ...',
+                inputAttributes: {
+                    'aria-label': 'Type your message here'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar',
+                cancelButtonText: 'Cancelar',
+            });
+
+            if (isCanceled)
+                return;
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SellShoe", "Category")",
+                data: {
+                    hashCode: barcode,
+                    note: text
+                },
+                success: function (data) {
+                    if (!data.success) {
+                        Swal.fire('Ops', `Não foi possível remove o item do estoque, detalhes: ${ data.message }`,'error');
+                        return;
+                    }
+
+                    Swal.fire('Sucesso', 'O produto foi removido do estoque. \n\nParabéns pela venda!', 'success');
+                },
+                error: function () {
+                    Swal.fire('Ops', 'problemas ao conectar com o servidor! \n\nTente novamente mais tarde.', 'error');
+                }
+            });
+        }
+
+        function submitShoeCreation() {
+
+        }
+
+        function downloadExcelFile() {
             Swal.fire({
                 title: "Atenção!",
                 text: "O formulário será gerado dos valores em tela",
@@ -342,98 +485,3 @@
         };
     </script>
 }
-
-
-@*@if (test)
-    {
-
-        <h1>Leitor de QR Code</h1>
-        <video id="qr-video" width="300" height="300" autoplay></video>
-        <div id="qr-result"></div>
-
-        <script src="https://cdn.rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
-        <script>
-            const video = document.getElementById('qr-video');
-            const qrResult = document.getElementById('qr-result');
-
-            // Inicializar o leitor Instascan
-            const scanner = new Instascan.Scanner({ video: video });
-
-            // Adicionar um ouvinte para quando um código QR é escaneado
-            scanner.addListener('scan', function (content) {
-                qrResult.textContent = 'Conteúdo do QR code: ' + content;
-                console.log('Conteúdo do QR code no console: ' + content);
-            });
-
-            // Iniciar o leitor
-            Instascan.Camera.getCameras().then(function (cameras) {
-                if (cameras.length > 0) {
-                    scanner.start(cameras[0]); // Use a primeira câmera disponível
-                } else {
-                    console.error('Nenhuma câmera encontrada.');
-                }
-            }).catch(function (error) {
-                console.error('Erro ao acessar a câmera: ' + error);
-            });
-        </script>
-
-    }
-
-    @if (test2)
-    {
-        <h1>Leitor de Código de Barras</h1>
-        <video id="barcode-video" width="300" height="300" autoplay></video>
-        <div id="barcode-result"></div>
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-        <script>
-            const video = document.getElementById('barcode-video');
-            const barcodeResult = document.getElementById('barcode-result');
-
-            // Configuração do leitor de código de barras
-            Quagga.init({
-                inputStream: {
-                    name: 'Live',
-                    type: 'LiveStream',
-                    target: video,
-                },
-                decoder: {
-                    readers: ['code_128_reader', 'ean_reader', 'ean_8_reader'],
-                },
-            });
-
-            // Inicializar o leitor
-            Quagga.onDetected(function (result) {
-                const code = result.codeResult.code;
-                barcodeResult.textContent = 'Código de barras lido: ' + code;
-                console.log('Código de barras lido no console: ' + code);
-            });
-
-            Quagga.start();
-        </script>
-    }
-
-    @if (test3)
-    {
-        <h1>Gerador de QR Code</h1>
-        <input type="text" id="text-input" placeholder="Texto para gerar o QR Code">
-        <button onclick="generateQRCode()">Gerar QR Code</button>
-        <br>
-        <canvas id="qr-code-canvas" width="300" height="300"></canvas>
-
-        <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
-        <script>
-            function generateQRCode() {
-                const text = document.getElementById('text-input').value;
-                const qrCodeCanvas = document.getElementById('qr-code-canvas');
-
-                if (text.trim() !== '') {
-                    const qr = new QRious({
-                        element: qrCodeCanvas,
-                        value: text,
-                        size: 300
-                    });
-                }
-            }
-        </script>
-    }*@

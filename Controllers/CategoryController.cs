@@ -19,11 +19,13 @@ namespace StockControll.Controllers
     {
         private readonly AppDbContext _db;
         private readonly LogExtension _log;
+        private readonly User _loggedUser;
 
         public CategoryController()
         {
             this._db = new AppDbContext();
             this._log = new LogExtension(_db);
+            this._loggedUser = (User)System.Web.HttpContext.Current.Session["user"];
         }
 
         public ActionResult Index(FilterViewModel filters)
@@ -76,6 +78,168 @@ namespace StockControll.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditCategory(Category category)
+        {
+            using (var transaction = _db.Database.BeginTransaction()) {
+                try {
+                    if (!ModelState.IsValid)
+                        throw new Exception("Preencha o formulário corretamente");
+
+                    var alreadyCreated = _db.Categories.Where(c => c.Id == category.Id || c.Name == category.Name).Any();
+                    if (!alreadyCreated)
+                        throw new Exception("Já existem modelos de procutos com esse nome cadastrados");
+
+                    _log.AddMessage(
+                        Enums.ActivityType.CreateItems,
+                        $"O usuário editou o modelo de com o nome de { category.Name }, id: { category.Id }"
+                    );
+
+                    _db.Entry(category).State = EntityState.Modified;
+                    _db.SaveChanges();
+
+                    TempData["SuccessMessage"] = "Modelo de produtos editado com sucesso.";
+                    transaction.Commit();
+
+                    return RedirectToAction("Index", "Category");
+                }
+                catch (Exception ex) {
+                    TempData["ErrorMessage"] = (ex.InnerException ?? ex).Message;
+                    transaction.Rollback();
+
+                    return Index(new FilterViewModel());
+                }
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateShoe(Shoe newShoe)
+        {
+            using (var transaction = _db.Database.BeginTransaction()) {
+                try
+                {
+                    RemoveOverChekingOn("newShoe.Category");
+
+                    if (!ModelState.IsValid)
+                        throw new Exception("Preencha o formulário corretamente");
+
+                    var alreadyCreated = _db.Shoes.Where(s => s.BarCodeHash == newShoe.BarCodeHash).Any();
+                    if (alreadyCreated)
+                        throw new Exception("Já existem sapatos com esse código de barra cadastrados");
+
+                    var relatedCategory = _db.Categories.Find(newShoe.Category.Id);
+                    if (relatedCategory == null)
+                        throw new Exception("O Modelo do produto é inesistente");
+
+                    _log.AddMessage(
+                        Enums.ActivityType.CreateItems,
+                        $"O usuário criou um novo produto ({ newShoe.BarCodeHash }) vinculado ao modelo: { newShoe.Category.Id }"
+                    );
+
+                    newShoe.Category = relatedCategory;
+
+                    _db.Shoes.Add(newShoe);
+                    _db.SaveChanges();
+
+                    TempData["SuccessMessage"] = "Sapato criado com sucesso.";
+                    transaction.Commit();
+
+                    return RedirectToAction("Index", "Category");
+                }
+                catch (Exception ex) {
+                    TempData["ErrorMessage"] = (ex.InnerException ?? ex).Message;
+                    transaction.Rollback();
+
+                    return Index(new FilterViewModel());
+                }
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult EditShoe(Shoe shoe)
+        {
+            using (var transaction = _db.Database.BeginTransaction()) {
+                try 
+                {
+                    RemoveOverChekingOn("shoe.Category");
+
+                    if (!ModelState.IsValid)
+                        throw new Exception("Preencha o formulário corretamente");
+
+                    var alreadyCreated = _db.Shoes.Include(s => s.Category).FirstOrDefault(s => s.BarCodeHash == shoe.BarCodeHash);
+                    if (alreadyCreated == null)
+                        throw new Exception("O produto não foi encontrado");
+
+                    alreadyCreated.Price = shoe.Price;
+                    alreadyCreated.Size = shoe.Size;
+
+                    _log.AddMessage(
+                        Enums.ActivityType.CreateItems,
+                        $"O usuário editou o produto de hash ({ alreadyCreated.BarCodeHash }) vinculado ao modelo: { alreadyCreated.Category.Id }"
+                    );
+
+                    _db.Entry(alreadyCreated).State = EntityState.Modified;
+                    _db.SaveChanges();
+
+                    TempData["SuccessMessage"] = "Sapato criado com sucesso.";
+                    transaction.Commit();
+
+                     return RedirectToAction("Index", "Category");
+                }
+                catch (Exception ex) {
+                    TempData["ErrorMessage"] = (ex.InnerException ?? ex).Message;
+                    transaction.Rollback();
+
+                    return Index(new FilterViewModel());
+                }
+            }
+        }
+
+        [HttpPost]
+        public ActionResult SellShoe(string hashCode, string note)
+        {
+            using (var transaction = _db.Database.BeginTransaction()) {
+                try {
+                    var shoe = _db.Shoes.Find(hashCode);
+                    if (shoe == null)
+                        throw new Exception("O produto não foi encontrado");
+
+                    var user = _db.Users.Find(_loggedUser.Id);
+                    if (user == null)
+                        throw new Exception("O usuário não foi encontrado");
+
+                    _db.Sales.Add(new Sale
+                    {
+                        Shoe_BarCodeHash = shoe.BarCodeHash,
+                        Seller_Id = user.Id,
+                        CreatedAt = DateTime.Now,
+                    });
+
+                    _log.AddMessage(
+                       Enums.ActivityType.DeleteItems,
+                       $"O usuário retirou do estoquo o sapato ({ shoe.BarCodeHash }) e informou: '{ note }'"
+                    );
+
+                    _db.Entry(shoe).State = EntityState.Modified;
+                    _db.SaveChanges();
+
+                    transaction.Commit();
+                    return Json(new { success = true });
+                }
+                catch (Exception ex) {
+                    transaction.Rollback();
+
+                    return Json(new {
+                        success = false,
+                        message = (ex.InnerException ?? ex).Message,
+                    });
+                }
+            }
+        }
+
+        [HttpPost]
         public ActionResult GenerateReportOfCategories(FilterViewModel filters)
         {
             try {
@@ -90,7 +254,7 @@ namespace StockControll.Controllers
                 var listOfSizes = new int[] { 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 };
 
                 // Título
-                ws.Cells["A1"].Value = "RELATÓRIO DOS USUÁRIOS DA APLICAÇÃO";
+                ws.Cells["A1"].Value = "RELATÓRIO DE PRODUTOS";
                 ws.Cells["A1"].Style.Font.Size = 16;
                 ws.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
@@ -225,6 +389,14 @@ namespace StockControll.Controllers
             return groupedInfo[dic].ToString();
         }
 
+        private void RemoveOverChekingOn(string keyInitials)
+        {
+            var keysToRemove = ModelState.Keys.Where(key => key.StartsWith(keyInitials)).ToList();
+
+            foreach (var key in keysToRemove)
+                ModelState.Remove(key);
+        }
+
         private IPagedList<Category> GetCategories(FilterViewModel filters)
         {
             filters.VerifyFilter();
@@ -244,7 +416,7 @@ namespace StockControll.Controllers
 
             var idRange = exect.Select(e => e.Id).ToList();
 
-            var shoes = _db.Shoes.Where(s => idRange.Contains(s.Category.Id)).ToList();
+            var shoes = _db.Shoes.Where(s => idRange.Contains(s.Category.Id) && !_db.Sales.Any(sl => sl.Shoe_BarCodeHash == s.BarCodeHash)).ToList();
 
             foreach (var category in exect)
             {

@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
+using Newtonsoft.Json;
 
 namespace StockControll.Models
 {
@@ -30,9 +29,11 @@ namespace StockControll.Models
         public string Description { get; set; }
 
         [NotMapped]
+        [JsonIgnore]
         public virtual List<Shoe> Shoes { get; set; }
 
         [NotMapped]
+        [JsonIgnore]
         public virtual Dictionary<int, int> ShoesBySize { get; set; }
     }
 }
