@@ -25,6 +25,10 @@ namespace StockControll.Models
         public string Sole { get; set; }
 
         [Required]
+        [Display(Name = "Data de criação")]
+        public DateTime CreatedAt { get; set; }
+
+        [Required]
         [Display(Name = "Descrição do modelo")]
         public string Description { get; set; }
 

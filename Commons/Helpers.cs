@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Web.Mvc;
 
 namespace StockControll.Commons
 {
@@ -66,5 +67,12 @@ namespace StockControll.Commons
             // Verifica se os dígitos verificadores são iguais aos dígitos no CPF
             return digit1 == int.Parse(cpf[9].ToString()) && digit2 == int.Parse(cpf[10].ToString());
         }
+
+        public static DateTime EndDateOfCurrentStamp(this DateTime data)
+            => new DateTime(data.Year, data.Month, DateTime.DaysInMonth(data.Year, data.Month), 23, 59, 59);
+
+        public static DateTime StartDateOfTheMonth(this DateTime data)
+            => new DateTime(data.Year, data.Month, 1, 0, 0, 0);
+          
     }
 }

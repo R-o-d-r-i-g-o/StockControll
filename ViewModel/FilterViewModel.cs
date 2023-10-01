@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
+using StockControll.Commons;
 
 namespace StockControll.ViewModel
 {
@@ -28,6 +27,12 @@ namespace StockControll.ViewModel
         [Display(Name = "Nome do modelo")]
         public string SearchCategoryName { get; set; }
 
+        [Display(Name = "Data inícial")]
+        public DateTime StartDate { get; set; }
+
+        [Display(Name = "Data final")]
+        public DateTime EndDate { get; set; }
+
         public List<SelectListItem> GetPaginationOptions()
         {
             return new List<SelectListItem>()
@@ -42,11 +47,19 @@ namespace StockControll.ViewModel
 
         public void VerifyFilter()
         {
+            var curDate = DateTime.Now;
+
             if (this.Rows == default)
                 this.Rows = 10;
 
             if (this.Page == default)
                 this.Page = 1;
+
+            if (this.EndDate == default)
+                this.EndDate = curDate.EndDateOfCurrentStamp();
+
+            if (this.StartDate == default)
+                this.StartDate = curDate.StartDateOfTheMonth();
         }
     }
 }

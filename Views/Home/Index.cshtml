@@ -1,31 +1,157 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿@model StockControll.ViewModel.HomeViewModel
+
+@{
+    ViewBag.Title = "Rafale".ToUpper();
+
+    var chartData = Model.GetSalesByDay();
 }
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        background-color: #f5f5f5;
+    }
+
+    @@media (max-width: 768px) {
+        .title-rents {
+            font-size: 14px;
+        }
+
+        .rent-data .col-md-3 {
+            width: 50%;
+            float: left;
+        }
+    }
+</style>
+
 <div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    <h1 class="text-center">@ViewBag.Title</h1>
+    <h5 class="text-center">(Sistema genciador de estoque)</h5>
+    <br />
+
+    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "row g-3", role = "form" }))
+    {
+        <div class="col-md-6">
+            @Html.LabelFor(m => m.Filters.StartDate, new { @class = "form-label", @for = "user-name-search" })
+            @Html.TextBoxFor(m => m.Filters.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control", @id = "user-name-search", @type = "date", @value = Model.Filters.StartDate.ToString("yyyy-MM-dd") })
+        </div>
+        <div class="col-md-6">
+            @Html.LabelFor(m => m.Filters.EndDate, new { @class = "form-label", @for = "user-name-search" })
+            @Html.TextBoxFor(m => m.Filters.EndDate, "{0:yyyy-MM-dd}", new { @class = "form-control", @id = "user-name-search", @type = "date", @value = Model.Filters.EndDate.ToString("yyyy-MM-dd") })
+        </div>
+
+        <div class="col-lg-12" style="text-align: right; margin-top: 10px;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-check"></i>
+                Filtrar
+            </button>
+        </div>
+    }
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
+<div class="row rent-data">
+    <div class="col-md-3 col-sm-6 col-xs-6">
+        <h2 class="text-sm title-rents">Novos modelos</h2>
+        <p class="text-xs">
+            <a class="btn btn-default"
+               title="Nº de novos modelos de calçados ofertados refente ao período mostrado no filtro">
+                @Model.ModelsRegistred
+            </a>
         </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+    <div class="col-md-3 col-sm-6 col-xs-6">
+        <h2 class="text-sm title-rents">Produção (qtde.)</h2>
+        <p class="text-xs">
+            <a class="btn btn-default"
+               title="Nº de calçados produzidos refente ao período mostrado no filtro">
+                @Model.ShoesRegistred
+            </a>
+        </p>
     </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    <div class="col-md-3 col-sm-6 col-xs-6">
+        <h2 class="text-sm title-rents">Vendas do período</h2>
+        <p class="text-xs">
+            <a class="btn btn-default"
+               title="Nº de vendas refente ao período mostrado no filtro">
+                @Model.SaleDetails.Count()
+            </a>
+        </p>
+    </div>
+    <div class="col-md-3 col-sm-6 col-xs-6">
+        <h2 class="text-sm title-rents">Ticket médio (R$)</h2>
+        <p class="text-xs">
+            <a class="btn btn-default"
+               title="(soma dos valores dos calçados) / (número de calçados)">
+                @Model.AverageTicket().ToString("0.00")
+            </a>
+        </p>
     </div>
 </div>
+
+<ul class="list-group">
+    <li class="list-group-item">
+        <canvas id="meuGrafico" width="400" height="200"></canvas>
+    </li>
+    <li class="list-group-item">
+        <a onclick="loadDetailedData()" style="cursor: pointer;">
+            Resumo de vendas por dia
+        </a>
+    </li>
+</ul>
+
+<script>
+
+    var chartInfo = @Html.Raw(Json.Encode(chartData));
+
+    var listHTML = '';
+    chartInfo.DayOfMonth.forEach(function (day, index) {
+        var value = chartInfo.GrupedPrices[index];
+
+        if (value > 0) {
+            listHTML += '<p>' + day + ' - R$ ' + value.toFixed(2) + '</p>';
+        }
+    });
+
+    function loadDetailedData() {
+
+        Swal.fire({
+            icon: '',
+            title: 'Resumo transacionado',
+            html: listHTML,
+            footer: '*Obs.: As vendas automaticamente serão contabilizadas aqui. \n'
+                  + 'Caso sinta a falta de alguma, comunique imediatamente.'
+        })
+    }
+
+    $(document).ready(function () {
+        var ctx = document.getElementById('meuGrafico').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartInfo.DayOfMonth,
+                datasets: [{
+                    label: 'Vendas (R$)',
+                    data: chartInfo.GrupedPrices,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+
+</script>

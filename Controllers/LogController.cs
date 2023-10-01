@@ -14,7 +14,14 @@ namespace StockControll.Controllers
     [Authorize]
     public class LogController : Controller
     {
-        private readonly AppDbContext _db = new AppDbContext();
+        private readonly AppDbContext _db;
+        private readonly User _loggedUser;
+
+        public LogController()
+        {
+            this._db = new AppDbContext();
+            this._loggedUser = (User)System.Web.HttpContext.Current.Session["user"];
+        }
 
         public ActionResult Index(FilterViewModel filters)
         {
@@ -23,6 +30,12 @@ namespace StockControll.Controllers
 
             if (TempData["SuccessMessage"] != null)
                 ViewBag.SuccessMessage = TempData["SuccessMessage"].ToString();
+
+            if (_loggedUser.UserType != Enums.UserType.Admin) {
+                ViewBag.ErrorMessage = $"{ _loggedUser.Name }, você não tem permissao para entrar nesta tela";
+
+                return RedirectToAction("Index", "Home");
+            }
 
             return View("Index", new LogViewModel {
                 Filters = filters,
