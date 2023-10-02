@@ -10,6 +10,12 @@
 }
 
 <style>
+    .product_warning {
+        color: orangered;
+        font-size: 10px;
+        letter-spacing: 1px;
+    }
+
     .usability-button {
         cursor: pointer;
     }
@@ -91,10 +97,20 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse-@category.Id">
+                    <a style="text-decoration: initial;" data-toggle="collapse" data-parent="#accordion" href="#collapse-@category.Id">
                         <h4 class="panel-title space-between">
                             @category.Name
-                            <span class="badge">@shoesIncluded</span>
+
+                            <span>
+                                @if (shoesIncluded < 10)
+                                {
+                                    <i class="fa-solid fa-triangle-exclamation product_warning"
+                                       title="O produto possui menos de 10 unidades em estoque.">
+                                       Em falta
+                                    </i>
+                                }
+                                <span class="badge">@shoesIncluded</span>
+                            </span>
                         </h4>
                     </a>
                 </div>
@@ -361,6 +377,8 @@
                 <div class="modal-body">
                     @Html.AntiForgeryToken()
 
+                    @Html.Hidden("newCategory.CreatedAt", DateTime.Now)
+
                     <div class="form-group">
                         @Html.LabelFor(m => m.NewCategory.Name, new { @class = "form-label", @for = "new-user-name" })
                         @Html.TextBoxFor(m => m.NewCategory.Name, new { @class = "form-control", @id = "new-user-name" })
@@ -433,22 +451,20 @@
                     hashCode: barcode,
                     note: text
                 },
-                success: function (data) {
+                success: async function (data) {
                     if (!data.success) {
                         Swal.fire('Ops', `Não foi possível remove o item do estoque, detalhes: ${ data.message }`,'error');
                         return;
                     }
 
-                    Swal.fire('Sucesso', 'O produto foi removido do estoque. \n\nParabéns pela venda!', 'success');
+                    await Swal.fire('Sucesso', 'O produto foi removido do estoque. \n\nParabéns pela venda!', 'success');
+
+                    location.reload();
                 },
                 error: function () {
                     Swal.fire('Ops', 'problemas ao conectar com o servidor! \n\nTente novamente mais tarde.', 'error');
                 }
             });
-        }
-
-        function submitShoeCreation() {
-
         }
 
         function downloadExcelFile() {

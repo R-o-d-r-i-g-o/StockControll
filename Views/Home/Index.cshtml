@@ -9,6 +9,26 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+    .square-container {
+        height: 80px;
+        background-color: #f0f0f0;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 10px;
+    }
+
+    .date {
+        font-size: 14px;
+        color: #333;
+    }
+
+    .price {
+        font-weight: bold;
+        font-size: 16px;
+        color: #007bff;
+    }
+
     .card {
         border: 1px solid #ccc;
         border-radius: 5px;
@@ -101,26 +121,33 @@
     </li>
     <li class="list-group-item">
         <a onclick="loadDetailedData()" style="cursor: pointer;">
-            Resumo de vendas por dia
+            Resumo de vendas
         </a>
     </li>
 </ul>
 
 <script>
-
     var chartInfo = @Html.Raw(Json.Encode(chartData));
 
     var listHTML = '';
+
+    if (chartInfo.DayOfMonth.length <= 0)
+        listHTML = '<p>Ainda não existem vendas registradas</p>'
+
     chartInfo.DayOfMonth.forEach(function (day, index) {
         var value = chartInfo.GrupedPrices[index];
 
         if (value > 0) {
-            listHTML += '<p>' + day + ' - R$ ' + value.toFixed(2) + '</p>';
+            listHTML += `
+                <div class="square-container">
+                    <p class="date">${day}</p>
+                    <p class="price">R$ ${value.toFixed(2)}</p>
+                </div>
+            `;
         }
     });
 
     function loadDetailedData() {
-
         Swal.fire({
             icon: '',
             title: 'Resumo transacionado',
@@ -153,5 +180,4 @@
             }
         });
     });
-
 </script>
