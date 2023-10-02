@@ -19,6 +19,8 @@ namespace StockControll.Controllers
 
             if (TempData["SuccessMessage"] != null)
                 ViewBag.SuccessMessage = TempData["SuccessMessage"].ToString();
+            
+            ResetCookies();
 
             return View("Index");
         }

@@ -257,7 +257,7 @@ namespace StockControll.Controllers
                 var excelPackage = new ExcelPackage();
                 var ws = excelPackage.Workbook.Worksheets.Add(fileName);
 
-                var listOfSizes = new int[] { 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 };
+                var listOfSizes = Constants.GetPossibleFootSizes();
 
                 // Título
                 ws.Cells["A1"].Value = "RELATÓRIO DE PRODUTOS";

@@ -8,11 +8,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Meu Aplicativo ASP.NET</title>
+    <title>RAFALE - @ViewBag.Title</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+X8/MFSc1UTd6ftl/Aq4gVgOp+OrCXaRkfjENn5wRGa0Jj4" crossorigin="anonymous">
-
-    @* para pegar icones: https://fontawesome.com/search *@
 
     <style>
         .splitter {
@@ -37,57 +35,63 @@
     @Scripts.Render("~/Content/code.jquery.com_jquery-3.7.1.min.js", "~/Content/sweetalert2.min.js", "~/Content/app_scripts.js")
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>
-                        <a href="@Url.Action("Index", "Home")">
-                            <i class="fa-solid fa-truck-fast"></i>
-                            Baixa de calçados
-                        </a>
-                    </li>
-                    <li>
-                        <a href="@Url.Action("Index", "Category")">
-                            <i class="fa-solid fa-tag"></i>
-                            Modelos de calçado
-                        </a>
-                    </li>
-                    @if (user.UserType == Enums.UserType.Admin)
-                    {
+    @if (user != null)
+    {
+        var isAdminUser = user.UserType == Enums.UserType.Admin;
+
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
                         <li>
-                            <a href="@Url.Action("Index", "User")">
-                                <i class="fa-solid fa-users"></i>
-                                Usuários
+                            <a href="@Url.Action("Index", "Home")">
+                                <i class="fa-solid fa-truck-fast"></i>
+                                Baixa de calçados
                             </a>
                         </li>
                         <li>
-                            <a href="@Url.Action("Index", "Log")">
-                                <i class="fa-solid fa-folder-open"></i>
-                                Registros
+                            <a href="@Url.Action("Index", "Category")">
+                                <i class="fa-solid fa-tag"></i>
+                                Modelos de calçado
                             </a>
                         </li>
-                    }
-                </ul>
-                <hr class="splitter" />
-                <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a href="@Url.Action("SignOut", "Login")">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                            Sair
-                        </a>
-                    </li>
-                </ul>
+                        @if (isAdminUser)
+                        {
+                            <li>
+                                <a href="@Url.Action("Index", "User")">
+                                    <i class="fa-solid fa-users"></i>
+                                    Usuários
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index", "Log")">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                    Registros
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                    <hr class="splitter" />
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="@Url.Action("SignOut", "Login")">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                Sair
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
+    }
+
     <div class="container body-content align-page-bottom">
         @RenderBody()
 
