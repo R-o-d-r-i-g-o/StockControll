@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Web.Mvc;
 
 namespace StockControll.Commons
 {
@@ -73,6 +72,6 @@ namespace StockControll.Commons
 
         public static DateTime StartDateOfTheMonth(this DateTime data)
             => new DateTime(data.Year, data.Month, 1, 0, 0, 0);
-          
+
     }
 }

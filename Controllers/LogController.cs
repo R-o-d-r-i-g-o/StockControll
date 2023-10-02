@@ -25,6 +25,9 @@ namespace StockControll.Controllers
 
         public ActionResult Index(FilterViewModel filters)
         {
+            if (_loggedUser == null)
+                return RedirectToAction("Index", "Login");
+
             if (TempData["ErrorMessage"] != null)
                 ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
 

@@ -27,7 +27,7 @@ namespace StockControll.ViewModel
                 .GroupBy(s => s.Sale.CreatedAt.Date)
                 .ToDictionary(g => g.Key, g => g.Sum(s => s.Shoe.Price));
 
-            var labels = dateRange.Select(date => date.ToString("yyyy-MM-dd")).ToList();
+            var labels = dateRange.Select(date => date.ToString("dd/MM/yyyy")).ToList();
             var prices = dateRange.Select(date => groupedSale.ContainsKey(date) ? groupedSale[date] : 0).ToList();
 
             return new ChartData

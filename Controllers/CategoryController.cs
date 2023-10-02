@@ -30,6 +30,9 @@ namespace StockControll.Controllers
 
         public ActionResult Index(FilterViewModel filters)
         {
+            if (_loggedUser == null)
+                return RedirectToAction("Index", "Login");
+
             if (TempData["ErrorMessage"] != null)
                 ViewBag.ErrorMessage = TempData["ErrorMessage"].ToString();
 
@@ -86,14 +89,17 @@ namespace StockControll.Controllers
                     if (!ModelState.IsValid)
                         throw new Exception("Preencha o formulário corretamente");
 
-                    var alreadyCreated = _db.Categories.Where(c => c.Id == category.Id || c.Name == category.Name).Any();
-                    if (!alreadyCreated)
+                    var alreadyCreated = _db.Categories.FirstOrDefault(c => c.Id == category.Id || c.Name == category.Name);
+                    if (alreadyCreated == null)
                         throw new Exception("Já existem modelos de procutos com esse nome cadastrados");
 
                     _log.AddMessage(
                         Enums.ActivityType.CreateItems,
                         $"O usuário editou o modelo de com o nome de { category.Name }, id: { category.Id }"
                     );
+
+                    // *Obs.: não permitir a alteração deste campo
+                    category.CreatedAt = alreadyCreated.CreatedAt;
 
                     _db.Entry(category).State = EntityState.Modified;
                     _db.SaveChanges();
