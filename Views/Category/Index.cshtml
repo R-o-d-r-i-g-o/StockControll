@@ -1,15 +1,25 @@
 ﻿@model StockControll.ViewModel.CategoryViewModel
 @using StockControll.Commons
-@using Newtonsoft.Json;
 @using PagedList.Mvc
 
 @{
-    var listOfSizes = new int[] { 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52 };
+    var listOfSizes = Constants.GetPossibleFootSizes();
 
     ViewBag.Title = "Modelos de calçados";
 }
 
 <style>
+    .check-qr-code-info video,
+    .check-qr-code-info canvas {
+        width: 100%;
+    }
+
+    .check-qr-code-info canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
     .product_warning {
         color: orangered;
         font-size: 10px;
@@ -106,7 +116,7 @@
                                 {
                                     <i class="fa-solid fa-triangle-exclamation product_warning"
                                        title="O produto possui menos de 10 unidades em estoque.">
-                                       Em falta
+                                        Em falta
                                     </i>
                                 }
                                 <span class="badge">@shoesIncluded</span>
@@ -211,7 +221,7 @@
                                                                         </div>
                                                                         <div class="form-group">
                                                                             @Html.LabelFor(_ => shoe.Size, new { @class = "form-label", @for = $"shoe-size-{category.Id}" })
-                                                                            @Html.TextBoxFor(_ => shoe.Size, new { @class = "form-control", @id = $"shoe-size-{category.Id}" })
+                                                                            @Html.DropDownListFor(_ => shoe.Size, Model.GetPossibleFootSizes(shoe.Size), "Escolha um tamanho", new { @class = "form-control", @id = $"shoe-size-{category.Id}" })
                                                                             @Html.ValidationMessageFor(_ => shoe.Size)
                                                                         </div>
                                                                     </div>
@@ -263,6 +273,10 @@
                                             @Html.LabelFor(m => m.newShoe.BarCodeHash, new { @class = "form-label", @for = $"shoe-barcode-{category.Id}" })
                                             @Html.TextBoxFor(m => m.newShoe.BarCodeHash, new { @class = "form-control", @id = $"shoe-barcode-{category.Id}" })
                                             @Html.ValidationMessageFor(m => m.newShoe.BarCodeHash)
+
+                                            <a id="scan" onclick="getBarcodeRequester(this)"  class="btn btn-sm btn-primary margin-top-10">
+                                                Escanear código de barras
+                                            </a>
                                         </div>
                                         <div class="form-group">
                                             @Html.LabelFor(m => m.newShoe.Price, new { @class = "form-label", @for = $"shoe-price-{category.Id}" })
@@ -410,6 +424,27 @@
     </div>
 </div>
 
+@* barcode scanner *@
+<div class="modal fade" id="livestream_scanner">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Barcode Scanner</h4>
+            </div>
+            <div class="modal-body check-qr-code-info">
+                <div id="interactive" class="viewport"></div>
+                <div class="error"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
 
     @if (ViewBag.SuccessMessage != null)
@@ -426,7 +461,19 @@
         </script>
     }
 
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <script type="text/javascript" src="~/Content/barcode.js"></script>
     <script>
+        var barcodeInput;
+
+        function getBarcodeRequester(caller) {
+            var container = caller.closest('div.form-group');
+
+            barcodeInput = $(container).find('input[type="text"]:first');;
+            $('#livestream_scanner').modal('show');
+        }
+
         async function submitSelling(barcode) {
             const { value: text, dismiss: isCanceled } = await Swal.fire({
                 title: 'Retirada de item do estoque',
@@ -499,5 +546,23 @@
                 });
             });
         };
+
+        $(document).ready(function (event) {
+
+            $("#scan").click(function (e) {
+                e.preventDefault();
+
+                $("#scanner_input").attr('readonly', true);
+            });
+
+            Quagga.onDetected(function (result) {
+                if (result.codeResult.code) {
+                    barcodeInput.val(result.codeResult.code);
+
+                    Quagga.stop();
+                    setTimeout(function () { $('#livestream_scanner').modal('hide'); }, 1000);
+                }
+            });
+        })
     </script>
 }

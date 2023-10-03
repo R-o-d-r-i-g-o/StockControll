@@ -227,6 +227,7 @@
   <ItemGroup>
     <Content Include="Content\app_scripts.js" />
     <Content Include="Content\app_styles.css" />
+    <Content Include="Content\barcode.js" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />

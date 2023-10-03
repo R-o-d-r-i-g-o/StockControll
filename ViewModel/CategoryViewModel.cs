@@ -13,7 +13,7 @@ namespace StockControll.ViewModel
         public Category NewCategory { get; set; }
         public Shoe newShoe { get; set; }
 
-        public List<SelectListItem> GetPossibleFootSizes()
+        public List<SelectListItem> GetPossibleFootSizes(int sizeChecked)
         {
             var footSizes = new List<SelectListItem>();
 
@@ -22,7 +22,8 @@ namespace StockControll.ViewModel
                 footSizes.Add(new SelectListItem
                 {
                     Text = size.ToString(),
-                    Value = size.ToString()
+                    Value = size.ToString(),
+                    Selected = size == sizeChecked
                 });
             }
 
