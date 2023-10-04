@@ -1,0 +1,57 @@
+﻿@model StockControll.Models.User
+@using StockControll.Commons
+
+<div class="modal fade" id="@($"edit-user-modal-{Model.Id}")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("EditUser", "User", FormMethod.Post, new { @onsubmit = "submitForm(this)", @id = $"edit-user-form-{Model.Id}", role = "form" }))
+            {
+                <div class="modal-header">
+                    <h3 class="modal-title">Edição de usuário</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+
+                    @Html.HiddenFor(m => m.Id)
+
+                    @Html.HiddenFor(m => m.CreatedAt)
+
+                    @Html.HiddenFor(m => m.DeletedAt)
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Name, new { @class = "form-label", @for = $"user-name-{Model.Id}" })
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @id = $"user-name-{Model.Id}" })
+                        @Html.ValidationMessageFor(m => m.Name)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.CPF, new { @class = "form-label", @for = $"user-cpf-{Model.Id}" })
+                        @Html.TextBoxFor(m => m.CPF, new { @class = "form-control", @id = $"user-cpf-{Model.Id}", maxlength = "11", @oninput = "RemoveSpecialCharacters(this)" })
+                        @Html.ValidationMessageFor(m => m.CPF)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Email, new { @class = "form-label", @for = $"user-email-{Model.Id}" })
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @id = $"user-email-{Model.Id}" })
+                        @Html.ValidationMessageFor(m => m.Email)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Password, new { @class = "form-label", @for = $"user-password-{Model.Id}" })
+                        @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @id = $"user-password-{Model.Id}" })
+                        @Html.ValidationMessageFor(m => m.Password)
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.UserType, new { @class = "form-label", @for = $"user-type-{Model.Id}" })
+                        @Html.DropDownListFor(m => m.UserType, Enums.GetUsertypeOptions(Model.UserType), "Choose an option", new { @class = "form-control", @id = $"user-type-{Model.Id}" })
+                        @Html.ValidationMessageFor(m => m.UserType)
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>

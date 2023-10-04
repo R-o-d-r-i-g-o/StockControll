@@ -225,6 +225,7 @@
     <Compile Include="ViewModel\UsersViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\app_form_submit.js" />
     <Content Include="Content\app_scripts.js" />
     <Content Include="Content\app_styles.css" />
     <Content Include="Content\barcode.js" />
@@ -260,7 +261,9 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Views\Category\_modal_create.cshtml" />
+    <Content Include="Views\Category\_modal_barcode_reader.cshtml" />
     <None Include="Views\Login\Index.cshtml" />
+    <None Include="Views\User\_modal_create.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -276,6 +279,7 @@
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Category\Index.cshtml" />
     <Content Include="Views\Log\Index.cshtml" />
+    <Content Include="Views\User\_modal_edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Code\" />
