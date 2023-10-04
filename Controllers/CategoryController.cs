@@ -47,23 +47,23 @@ namespace StockControll.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateCategory(Category newCategory)
+        public ActionResult CreateCategory(Category model)
         {
             using (var transaction = _db.Database.BeginTransaction()) {
                 try {
                     if (!ModelState.IsValid)
                         throw new Exception("Preencha o formulário corretamente");
 
-                    var alreadyCreated = _db.Categories.Where(c => c.Id == newCategory.Id || c.Name == newCategory.Name).Any();
+                    var alreadyCreated = _db.Categories.Where(c => c.Id == model.Id || c.Name == model.Name).Any();
                     if (alreadyCreated)
                         throw new Exception("Já existem modelos de procutos com esse nome cadastrados");
 
                     _log.AddMessage(
                         Enums.ActivityType.CreateItems,
-                        $"O usuário criou um novo modelo de produtos com o nome de: { newCategory.Name }"
+                        $"O usuário criou um novo modelo de produtos com o nome de: { model.Name }"
                     );
 
-                    _db.Categories.Add(newCategory);
+                    _db.Categories.Add(model);
                     _db.SaveChanges();
 
                     TempData["SuccessMessage"] = "Modelo criado com sucesso.";

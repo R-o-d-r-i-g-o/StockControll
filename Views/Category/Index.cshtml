@@ -377,52 +377,7 @@
     })
 }
 
-@* Modal para criar categoria *@
-<div class="modal fade" id="create-category-modal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            @using (Html.BeginForm("CreateCategory", "Category", FormMethod.Post, new { @onsubmit = "submitForm(this, 1)", @id = $"create-user-form", role = "form" }))
-            {
-                <div class="modal-header">
-                    <h3 class="modal-title">Criar novo modelo de produto</h3>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-
-                <div class="modal-body">
-                    @Html.AntiForgeryToken()
-
-                    @Html.Hidden("newCategory.CreatedAt", DateTime.Now)
-
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.NewCategory.Name, new { @class = "form-label", @for = "new-user-name" })
-                        @Html.TextBoxFor(m => m.NewCategory.Name, new { @class = "form-control", @id = "new-user-name" })
-                        @Html.ValidationMessageFor(m => m.NewCategory.Name)
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.NewCategory.Color, new { @class = "form-label", @for = "new-user-cpf" })
-                        @Html.TextBoxFor(m => m.NewCategory.Color, new { @class = "form-control", @id = "new-user-cpf" })
-                        @Html.ValidationMessageFor(m => m.NewCategory.Color)
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.NewCategory.Sole, new { @class = "form-label", @for = "new-user-email" })
-                        @Html.TextBoxFor(m => m.NewCategory.Sole, new { @class = "form-control", @id = "new-user-email" })
-                        @Html.ValidationMessageFor(m => m.NewCategory.Sole)
-                    </div>
-                    <div class="form-group">
-                        @Html.LabelFor(m => m.NewCategory.Description, new { @class = "form-label", @for = "new-user-password" })
-                        @Html.TextAreaFor(m => m.NewCategory.Description, new { @class = "form-control", @id = "new-user-password" })
-                        @Html.ValidationMessageFor(m => m.NewCategory.Description)
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                </div>
-            }
-        </div>
-    </div>
-</div>
+@Html.Partial("~/Views/Category/_modal_create.cshtml", new StockControll.Models.Category())
 
 @* barcode scanner *@
 <div class="modal fade" id="livestream_scanner">
